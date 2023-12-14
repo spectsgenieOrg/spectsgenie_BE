@@ -1,3 +1,14 @@
+<?php
+
+if (session()->has('type')) {
+    if (session()->get('type') == "superadmin") {
+        //header('Location:/all-products');
+    }
+}
+
+?>
+<script src="<?php echo base_url(); ?>assets/js/jquery.validate.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/additional-methods.min.js"></script>
 <div class="login-box">
     <!-- /.login-logo -->
     <div class="card card-outline card-primary">
@@ -7,22 +18,12 @@
         <div class="card-body">
             <p class="login-box-msg">Sign in to start your session</p>
 
-            <form method="post">
+            <form id="adminLoginForm" class="sgForm">
                 <div class="input-group mb-3">
-                    <input type="email" class="form-control" placeholder="Email">
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-envelope"></span>
-                        </div>
-                    </div>
+                    <input type="email" name="email" class="form-control login-input" placeholder="Email">
                 </div>
                 <div class="input-group mb-3">
-                    <input type="password" class="form-control" placeholder="Password">
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-lock"></span>
-                        </div>
-                    </div>
+                    <input type="password" name="password" class="form-control login-input" placeholder="Password">
                 </div>
                 <div class="row">
                     <div class="col-8">
@@ -50,3 +51,46 @@
     <!-- /.card -->
 </div>
 <!-- /.login-box -->
+
+<script>
+    function convertFormToJSON(form) {
+        return $(form)
+            .serializeArray()
+            .reduce(function(json, {
+                name,
+                value
+            }) {
+                json[name] = value;
+                return json;
+            }, {});
+    }
+
+    $("#adminLoginForm").submit(function(event) {
+        event.preventDefault();
+    }).validate({
+        rules: {
+            email: "required",
+            password: "required"
+        },
+        submitHandler: function(form) {
+            const data = [...new FormData(form)];
+            let obj = {};
+            data.forEach((value) => {
+                obj[value[0]] = value[1]
+            });
+            $.ajax({
+                url: '<?php echo base_url(); ?>admin/login',
+                type: 'POST',
+                data: JSON.stringify(obj),
+                dataType: 'json',
+                success: function(as) {
+                    if (as.status == true) {
+                        location.href = "products/all";
+                    } else if (as.status == false) {
+                        alert("Wrong Email or Password");
+                    }
+                }
+            });
+        }
+    });
+</script>
