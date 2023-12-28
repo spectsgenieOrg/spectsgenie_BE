@@ -105,4 +105,19 @@ class Products extends BaseController
 
         echo json_encode($response);
     }
+
+    public function getProductByCategory($category, $gender) {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+        $parentProducts = $productModel->getGroupedParentProduct($category, $gender);
+        
+        foreach($parentProducts as $parent) {
+            $parent->products = $productModel->getProductByCategoryGenderParent($category, $gender, $parent->parent_product_id);
+        }
+
+        $response = array("status" => count($parentProducts) > 0 ? true : false, "message" => count($parentProducts) > 0 ? "List of products" : "List is empty", "data" => $parentProducts);
+
+        echo json_encode($response);
+    }
 }
