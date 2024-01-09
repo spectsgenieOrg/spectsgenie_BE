@@ -34,8 +34,16 @@
                                 <input type="text" id="inputName" value="<?php echo $product->pr_name; ?>" name="pr_name" class="form-control">
                             </div>
                             <div class="form-group">
+                                <label for="inputName">Product Slug (To be used in the website URL)</label>
+                                <input type="text" id="inputSlug" value="<?php echo $product->slug; ?>" name="slug" class="form-control">
+                            </div>
+                            <div class="form-group">
                                 <label for="inputDescription">Product Description</label>
                                 <textarea id="inputDescription" class="form-control" name="pr_description" rows="4"><?php echo $product->pr_description; ?></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputImages">Product Images</label>
+                                <input type="file" multiple id="inputImages" name="images[]" class="form-control">
                             </div>
                         </div>
                         <!-- /.card-body -->
@@ -128,7 +136,7 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="inputGender">Choose Gender</label>
-                                <select class="form-control select2" multiple="multiple" data-placeholder="Select a gender" data-dropdown-css-class="select2-purple" name="sg_gender_ids" id="inputGender">
+                                <select class="form-control select2" multiple="multiple" data-placeholder="Select a gender" data-dropdown-css-class="select2-purple" name="sg_gender_ids[]" id="inputGender">
                                     <?php foreach ($genders as $gender) : ?>
 
                                         <option value="<?php echo $gender->id; ?>"><?php echo $gender->name; ?></option>
@@ -165,7 +173,7 @@
             <div class="row">
                 <div class="col-12">
                     <a href="#" class="btn btn-secondary">Cancel</a>
-                    <input type="submit" value="Create new Product" class="btn btn-success float-right">
+                    <input type="submit" value="Update product" class="btn btn-success float-right">
                 </div>
             </div>
         </form>
@@ -201,16 +209,18 @@
             bd_id: "required",
             ca_id: "required",
             parent_product_id: "required",
-            sg_gender_ids: "required"
+            sg_gender_ids: "required",
+            images: "required"
         },
         submitHandler: function(form) {
             const data = [...new FormData(form)];
-            console.log(convertFormToJSON(data));
             $.ajax({
                 url: '<?php echo base_url(); ?>products/update/<?php echo $product->pr_id; ?>',
                 type: 'POST',
-                data: convertFormToJSON(data),
+                data: new FormData(form),
                 dataType: 'json',
+                processData: false,
+                contentType: false,
                 success: function(as) {
                     if (as.status == true) {
                         alert(as.message);

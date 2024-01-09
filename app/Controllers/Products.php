@@ -21,8 +21,14 @@ class Products extends BaseController
         $db = db_connect();
 
         $productModel = new ProductModel($db);
-        var_dump(session()->get('user_id'));
-        $data['products'] = $productModel->allProducts();
+        $products = $productModel->allProducts();
+
+        foreach ($products as $product) {
+            $product->parent_product = $productModel->getParentProductById($product->parent_product_id);
+            $product->productCategory = $productModel->getCategoryDetail($product->ca_id);
+        }
+
+        $data['products'] = $products;
 
         return view('common/header')
             . view('pages/all-products', $data)
@@ -97,7 +103,34 @@ class Products extends BaseController
         $db = db_connect();
 
         $productModel = new ProductModel($db);
-        $post = json_decode($this->request->getBody());
+
+        $images = "";
+        $gender = "";
+        $post = $this->request->getVar();
+        foreach ($post['sg_gender_ids'] as $gen) {
+            $gender .= $gen . ",";
+        }
+
+        $gender = rtrim($gender, ',');
+
+        if ($this->request->getFileMultiple('images')) {
+            $files = $this->request->getFileMultiple('images');
+
+            foreach ($files as $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $newName = $file->getRandomName();
+                    $images .= 'uploads/' . $newName . ',';
+                    $file->move(WRITEPATH . 'uploads', $newName);
+                }
+            }
+        }
+
+        $imgList = rtrim($images, ',');
+
+        $post['pr_image'] = $imgList;
+        $post['sg_gender_ids'] = $gender;
+
+        $post = json_decode(json_encode($post));
 
         $isSaved = $productModel->updateProduct($post, $id);
 
@@ -106,13 +139,14 @@ class Products extends BaseController
         echo json_encode($response);
     }
 
-    public function getProductByCategory($category, $gender) {
+    public function getProductByCategory($category, $gender)
+    {
         $db = db_connect();
 
         $productModel = new ProductModel($db);
         $parentProducts = $productModel->getGroupedParentProduct($category, $gender);
-        
-        foreach($parentProducts as $parent) {
+
+        foreach ($parentProducts as $parent) {
             $parent->products = $productModel->getProductByCategoryGenderParent($category, $gender, $parent->parent_product_id);
         }
 

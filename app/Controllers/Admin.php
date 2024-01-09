@@ -57,4 +57,10 @@ class Admin extends BaseController
             echo json_encode(['status' => false, 'message' => 'Unsuccessful Login']);
         }
     }
+
+    public function logout()
+    {
+        session()->destroy();
+        return redirect()->route('login');
+    }
 }

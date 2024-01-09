@@ -1,5 +1,8 @@
 <script src="<?php echo base_url(); ?>assets/js/jquery.validate.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/additional-methods.min.js"></script>
+
+<?php $session = session();
+?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -28,6 +31,10 @@
                             <div class="form-group">
                                 <label for="inputName">Product Name</label>
                                 <input type="text" id="inputName" name="pr_name" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="inputName">Product Slug (To be used in the website URL)</label>
+                                <input type="text" id="inputSlug" name="slug" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label for="inputDescription">Product Description</label>
@@ -147,6 +154,8 @@
                     </div>
                     <!-- /.card -->
                 </div>
+
+                <input type="hidden" name="br_id" value="<?php echo $session->get('user_id'); ?>" />
             </div>
 
             <div class="row">

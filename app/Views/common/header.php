@@ -257,7 +257,7 @@ $roles = [];
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link cursor">
+                                <a href="/logout" class="nav-link cursor">
                                     <i class="nav-icon fas fa-sign-out-alt"></i>
                                     <p>
                                         Logout

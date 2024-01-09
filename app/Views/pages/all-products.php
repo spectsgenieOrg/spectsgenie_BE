@@ -48,8 +48,8 @@
                                             <td><?php echo $product->pr_name; ?>
                                             </td>
                                             <td><?php echo $product->pr_sku; ?></td>
-                                            <td><?php echo $product->parent_product_id; ?></td>
-                                            <td> <?php echo $product->ca_id; ?></td>
+                                            <td><?php echo $product->parent_product->name; ?></td>
+                                            <td> <?php echo $product->productCategory->ca_name; ?></td>
                                             <td>
                                                 <div>
                                                     <a href="<?php echo base_url() . 'products/edit/' . $product->pr_id; ?>"><i class="fas fa-pencil-alt"></i></a>
