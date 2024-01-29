@@ -22,4 +22,9 @@ class LenstypeModel extends Model
     {
         return $this->db->table('sg_lens_type')->insert($data) ? true : false;
     }
+
+    public function getLensTypeById($lensTypeId)
+    {
+        return $this->db->table('sg_lens_type')->select('*')->where('id', $lensTypeId)->get()->getRow();
+    }
 }

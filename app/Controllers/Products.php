@@ -17,6 +17,8 @@ class Products extends BaseController
         header('Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE');
     }
 
+    public $baseURL = 'https://newpos.spectsgenie.com/';
+
     /* Load UI pages */
 
     public function all()
@@ -218,15 +220,18 @@ class Products extends BaseController
             $parent->products = $productModel->getProductByCategoryGenderParent($category, $gender, $parent->parent_product_id);
 
             foreach ($parent->products as $product) {
-                $images = explode(",", $product->pr_image);
-                // var_dump($images);
-                $i = 0;
-                foreach ($images as $image) {
-                    $images[$i] = 'https://newpos.spectsgenie.com/' . $image;
-                    $i++;
-                }
+                if ($product->pr_image !== "") {
+                    $images = explode(",", $product->pr_image);
+                    $i = 0;
+                    foreach ($images as $image) {
+                        $images[$i] = $this->baseURL . $image;
+                        $i++;
+                    }
 
-                $product->pr_image = $images;
+                    $product->pr_image = $images;
+                } else {
+                    $product->pr_image = [];
+                }
             }
         }
 
@@ -240,31 +245,69 @@ class Products extends BaseController
         $db = db_connect();
 
         $productModel = new ProductModel($db);
+        $lensTypeModel = new LenstypeModel($db);
 
         $parentProduct = $productModel->getParentProductByName($parentName);
 
         $currentProduct = $productModel->getProductByParentIdandSlug($parentProduct->id, $slug);
 
-        $currentProductImages = explode(",", $currentProduct->pr_image);
-        $i = 0;
-        foreach ($currentProductImages as $image) {
-            $currentProductImages[$i] = 'https://newpos.spectsgenie.com/' . $image;
-            $i++;
+        if ($currentProduct->pr_image !== "") {
+            $currentProductImages = explode(",", $currentProduct->pr_image);
+            $i = 0;
+            foreach ($currentProductImages as $image) {
+                $currentProductImages[$i] = $this->baseURL . $image;
+                $i++;
+            }
+            $currentProduct->pr_image = $currentProductImages;
+        } else {
+            $currentProduct->pr_image = [];
         }
 
-        $currentProduct->pr_image = $currentProductImages;
+
+        if ($currentProduct->lens_type_ids !== "") {
+            $lensTypeForCurrentProduct = explode(",", $currentProduct->lens_type_ids);
+
+            $lensTypeIndex = 0;
+            foreach ($lensTypeForCurrentProduct as $lensTypeID) {
+                $lensTypeForCurrentProduct[$lensTypeIndex] = $lensTypeModel->getLensTypeById($lensTypeID);
+                $lensTypeForCurrentProduct[$lensTypeIndex]->icon = $this->baseURL . $lensTypeForCurrentProduct[$lensTypeIndex]->icon;
+                $lensTypeIndex++;
+            }
+            $currentProduct->lens_types = $lensTypeForCurrentProduct;
+        } else {
+            $currentProduct->lens_types = [];
+        }
+
 
         $productsBySameParent = $productModel->getProductsByParentId($parentProduct->id);
 
         foreach ($productsBySameParent as $product) {
-            $images = explode(",", $product->pr_image);
-            $i = 0;
-            foreach ($images as $image) {
-                $images[$i] = 'https://newpos.spectsgenie.com/' . $image;
-                $i++;
+            if ($product->pr_image !== "") {
+                $images = explode(",", $product->pr_image);
+                $i = 0;
+
+                foreach ($images as $image) {
+                    $images[$i] = $this->baseURL . $image;
+                    $i++;
+                }
+
+                $product->pr_image = $images;
+            } else {
+                $product->pr_image = [];
             }
 
-            $product->pr_image = $images;
+            if ($product->lens_type_ids !== "") {
+                $lensTypeForProduct = explode(",", $product->lens_type_ids);
+                $lenstypeidx = 0;
+                foreach ($lensTypeForProduct as $ltID) {
+                    $lensTypeForProduct[$lenstypeidx] = $lensTypeModel->getLensTypeById($ltID);
+                    $lensTypeForProduct[$lenstypeidx]->icon = $this->baseURL . $lensTypeForProduct[$lenstypeidx]->icon;
+                    $lenstypeidx++;
+                }
+                $product->lens_types = $lensTypeForProduct;
+            } else {
+                $product->lens_types = [];
+            }
         }
 
         $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => $productsBySameParent, "products_count" => count($productsBySameParent));
