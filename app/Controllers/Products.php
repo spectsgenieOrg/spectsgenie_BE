@@ -2,7 +2,10 @@
 
 namespace App\Controllers;
 
+use App\Models\LenstypeModel;
 use App\Models\ProductModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Products extends BaseController
 {
@@ -21,7 +24,26 @@ class Products extends BaseController
         $db = db_connect();
 
         $productModel = new ProductModel($db);
-        $products = $productModel->allProducts();
+        $products = $productModel->allProducts('online');
+
+        foreach ($products as $product) {
+            $product->parent_product = $productModel->getParentProductById($product->parent_product_id);
+            $product->productCategory = $productModel->getCategoryDetail($product->ca_id);
+        }
+
+        $data['products'] = $products;
+
+        return view('common/header')
+            . view('pages/all-products', $data)
+            . view('common/footer');
+    }
+
+    public function offline()
+    {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+        $products = $productModel->allProducts('');
 
         foreach ($products as $product) {
             $product->parent_product = $productModel->getParentProductById($product->parent_product_id);
@@ -47,8 +69,11 @@ class Products extends BaseController
         $db = db_connect();
 
         $productModel = new ProductModel($db);
+        $lensTypeModel = new LensTypeModel($db);
 
-        $data = array("brands" => $productModel->getBrands(), "genders" => $productModel->getGenders(), "categories" => $productModel->getCategories(), "parents" => $productModel->getParentProducts());
+        $lensTypes = $lensTypeModel->allLensTypes();
+
+        $data = array("brands" => $productModel->getBrands(), "genders" => $productModel->getGenders(), "categories" => $productModel->getCategories(), "parents" => $productModel->getParentProducts(), "lensTypes" => $lensTypes);
         return view('common/header')
             . view('pages/add-product', $data)
             . view('common/footer');
@@ -59,8 +84,9 @@ class Products extends BaseController
         $db = db_connect();
 
         $productModel = new ProductModel($db);
+        $lensTypeModel = new LenstypeModel($db);
 
-        $data = array("product" => $productModel->getProduct($id), "brands" => $productModel->getBrands(), "genders" => $productModel->getGenders(), "categories" => $productModel->getCategories(), "parents" => $productModel->getParentProducts());
+        $data = array("product" => $productModel->getProduct($id), "brands" => $productModel->getBrands(), "genders" => $productModel->getGenders(), "categories" => $productModel->getCategories(), "parents" => $productModel->getParentProducts(), "lensTypes" => $lensTypeModel->allLensTypes());
         return view('common/header')
             . view('pages/edit-product', $data)
             . view('common/footer');
@@ -89,7 +115,41 @@ class Products extends BaseController
         $db = db_connect();
 
         $productModel = new ProductModel($db);
-        $post = json_decode($this->request->getBody());
+        $images = "";
+        $gender = "";
+        $lensTypeIds = "";
+        $post = $this->request->getVar();
+        foreach ($post['sg_gender_ids'] as $gen) {
+            $gender .= $gen . ",";
+        }
+
+        $gender = rtrim($gender, ',');
+
+        foreach ($post['lens_type_ids'] as $lensTypeId) {
+            $lensTypeIds .= $lensTypeId . ",";
+        }
+
+        $lensTypeIds = rtrim($lensTypeIds, ',');
+
+        if ($this->request->getFileMultiple('images')) {
+            $files = $this->request->getFileMultiple('images');
+
+            foreach ($files as $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $newName = $file->getRandomName();
+                    $images .= 'uploads/' . $newName . ',';
+                    $file->move(ROOTPATH . 'public/uploads', $newName);
+                }
+            }
+        }
+
+        $imgList = rtrim($images, ',');
+
+        $post['pr_image'] = $imgList;
+        $post['sg_gender_ids'] = $gender;
+        $post['lens_type_ids'] = $lensTypeIds;
+
+        $post = json_decode(json_encode($post));
 
         $isSaved = $productModel->addProduct($post);
 
@@ -106,12 +166,19 @@ class Products extends BaseController
 
         $images = "";
         $gender = "";
+        $lensTypeIds = "";
         $post = $this->request->getVar();
         foreach ($post['sg_gender_ids'] as $gen) {
             $gender .= $gen . ",";
         }
 
         $gender = rtrim($gender, ',');
+
+        foreach ($post['lens_type_ids'] as $lensTypeId) {
+            $lensTypeIds .= $lensTypeId . ",";
+        }
+
+        $lensTypeIds = rtrim($lensTypeIds, ',');
 
         if ($this->request->getFileMultiple('images')) {
             $files = $this->request->getFileMultiple('images');
@@ -120,7 +187,7 @@ class Products extends BaseController
                 if ($file->isValid() && !$file->hasMoved()) {
                     $newName = $file->getRandomName();
                     $images .= 'uploads/' . $newName . ',';
-                    $file->move(WRITEPATH . 'uploads', $newName);
+                    $file->move(ROOTPATH . 'public/uploads', $newName);
                 }
             }
         }
@@ -129,6 +196,7 @@ class Products extends BaseController
 
         $post['pr_image'] = $imgList;
         $post['sg_gender_ids'] = $gender;
+        $post['lens_type_ids'] = $lensTypeIds;
 
         $post = json_decode(json_encode($post));
 
@@ -148,10 +216,71 @@ class Products extends BaseController
 
         foreach ($parentProducts as $parent) {
             $parent->products = $productModel->getProductByCategoryGenderParent($category, $gender, $parent->parent_product_id);
+
+            foreach ($parent->products as $product) {
+                $images = explode(",", $product->pr_image);
+                // var_dump($images);
+                $i = 0;
+                foreach ($images as $image) {
+                    $images[$i] = 'https://newpos.spectsgenie.com/' . $image;
+                    $i++;
+                }
+
+                $product->pr_image = $images;
+            }
         }
 
         $response = array("status" => count($parentProducts) > 0 ? true : false, "message" => count($parentProducts) > 0 ? "List of products" : "List is empty", "data" => $parentProducts);
 
         echo json_encode($response);
+    }
+
+    public function getProductByParentAndSlug($parentName, $slug)
+    {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+
+        $parentProduct = $productModel->getParentProductByName($parentName);
+
+        $currentProduct = $productModel->getProductByParentIdandSlug($parentProduct->id, $slug);
+
+        $currentProductImages = explode(",", $currentProduct->pr_image);
+        $i = 0;
+        foreach ($currentProductImages as $image) {
+            $currentProductImages[$i] = 'https://newpos.spectsgenie.com/' . $image;
+            $i++;
+        }
+
+        $currentProduct->pr_image = $currentProductImages;
+
+        $productsBySameParent = $productModel->getProductsByParentId($parentProduct->id);
+
+        foreach ($productsBySameParent as $product) {
+            $images = explode(",", $product->pr_image);
+            $i = 0;
+            foreach ($images as $image) {
+                $images[$i] = 'https://newpos.spectsgenie.com/' . $image;
+                $i++;
+            }
+
+            $product->pr_image = $images;
+        }
+
+        $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => $productsBySameParent, "products_count" => count($productsBySameParent));
+
+        echo json_encode($response);
+    }
+
+    public function addfromexcel()
+    {
+        $file = $this->request->getFile('productsSheet');
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getTempName());
+
+        $dataFromActiveSheet = $spreadsheet->getActiveSheet()->toArray();
+
+        foreach ($dataFromActiveSheet as $row) {
+            var_dump($row);
+        }
     }
 }

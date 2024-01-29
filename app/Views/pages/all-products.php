@@ -1,3 +1,8 @@
+<style>
+    span.platform {
+        text-transform: capitalize;
+    }
+</style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -36,6 +41,7 @@
                                         <th>SKU</th>
                                         <th>Product Parent</th>
                                         <th>Category</th>
+                                        <th>Product Platform</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -48,8 +54,13 @@
                                             <td><?php echo $product->pr_name; ?>
                                             </td>
                                             <td><?php echo $product->pr_sku; ?></td>
-                                            <td><?php echo $product->parent_product->name; ?></td>
+                                            <td><?php if ($product->parent_product !== NULL) {
+                                                    echo $product->parent_product->name;
+                                                } else {
+                                                    echo "NA";
+                                                } ?></td>
                                             <td> <?php echo $product->productCategory->ca_name; ?></td>
+                                            <td><span class="platform"><?php echo $product->platform !== 'online' ? 'In-Store' : 'Online'; ?></span></td>
                                             <td>
                                                 <div>
                                                     <a href="<?php echo base_url() . 'products/edit/' . $product->pr_id; ?>"><i class="fas fa-pencil-alt"></i></a>
@@ -85,7 +96,7 @@
         $('#example2').DataTable({
             "paging": true,
             "lengthChange": false,
-            "searching": false,
+            "searching": true,
             "ordering": true,
             "info": true,
             "autoWidth": false,

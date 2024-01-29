@@ -1,6 +1,9 @@
+<!-- Select2 -->
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 <script src="<?php echo base_url(); ?>assets/js/jquery.validate.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/additional-methods.min.js"></script>
-
+<script src="<?php echo base_url(); ?>assets/plugins/select2/js/select2.full.min.js"></script>
 <?php $session = session();
 ?>
 <!-- Content Wrapper. Contains page content -->
@@ -53,6 +56,10 @@
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
+                                <label for="inputImages">Product Images</label>
+                                <input type="file" multiple id="inputImages" name="images[]" class="form-control">
+                            </div>
+                            <div class="form-group">
                                 <label for="inputSku">Product SKU</label>
                                 <input type="text" id="inputSku" name="pr_sku" class="form-control">
                             </div>
@@ -73,6 +80,15 @@
                 <div class="col-md-6">
                     <div class="card card-primary">
                         <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputPlatform">Product Platform (Online/Store/Both)</label>
+                                <select class="form-control" data-placeholder="Select a platform" name="platform" id="inputPlatform">
+                                    <option disabled selected>Select a platform</option>
+                                    <option value="online">Online</option>
+                                    <option value="store">Store</option>
+                                    <option value="both">Both</option>
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <label for="inputSgPrice">Product SG Price</label>
                                 <input type="number" id="inputSgPrice" name="pr_price" class="form-control">
@@ -107,6 +123,66 @@
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
+                                <label for="inputASize">A Size</label>
+                                <input type="number" id="inputASize" name="pr_a_size" class="form-control">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputBSize">B Size</label>
+                                <input type="number" id="inputBSize" name="pr_b_size" class="form-control">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputASize">D Size</label>
+                                <input type="number" id="inputDSize" name="pr_d_size" class="form-control">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+
+                <input type="hidden" name="br_id" value="<?php echo $session->get('user_id'); ?>" />
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-3">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="lensType">Choose Lens Types</label>
+                                <select class="form-control select2" multiple="multiple" data-placeholder="Select lens type(s)" data-dropdown-css-class="select2-purple" name="lens_type_ids[]" id="lensType">
+                                    <?php foreach ($lensTypes as $lensType) : ?>
+                                        <option value="<?php echo $lensType->id; ?>"><?php echo $lensType->name; ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
                                 <label for="inputParent">Choose product parent</label>
                                 <select class="form-control" name="parent_product_id" id="inputParent">
                                     <option disabled selected>Select a parent product</option>
@@ -121,13 +197,12 @@
                     <!-- /.card -->
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="inputGender">Choose Gender</label>
-                                <select class="form-control" name="sg_gender_ids" id="inputGender">
-                                    <option disabled selected>Select Gender(s)</option>
+                                <select class="form-control select2" multiple="multiple" data-placeholder="Select a gender" data-dropdown-css-class="select2-purple" name="sg_gender_ids[]" id="inputGender">
                                     <?php foreach ($genders as $gender) : ?>
                                         <option value="<?php echo $gender->id; ?>"><?php echo $gender->name; ?></option>
                                     <?php endforeach ?>
@@ -139,7 +214,7 @@
                     <!-- /.card -->
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -178,6 +253,8 @@
         return JSON.stringify(obj);
     }
 
+    $('.select2').select2();
+
     $("#addProductForm").submit(function(event) {
         event.preventDefault();
     }).validate({
@@ -190,7 +267,12 @@
             bd_id: "required",
             ca_id: "required",
             parent_product_id: "required",
-            sg_gender_ids: "required"
+            "sg_gender_ids[]": "required",
+            platform: "required",
+            pr_a_size: "required",
+            pr_b_size: "required",
+            pr_d_size: "required",
+            "lens_type_ids[]": "required",
         },
         submitHandler: function(form) {
             const data = [...new FormData(form)];
@@ -198,8 +280,10 @@
             $.ajax({
                 url: '<?php echo base_url(); ?>products/addproduct',
                 type: 'POST',
-                data: convertFormToJSON(data),
+                data: new FormData(form),
                 dataType: 'json',
+                processData: false,
+                contentType: false,
                 success: function(as) {
                     if (as.status == true) {
                         alert(as.message);

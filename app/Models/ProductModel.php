@@ -13,9 +13,9 @@ class ProductModel extends Model
         $this->db = &$db;
     }
 
-    public function allProducts()
+    public function allProducts($platform)
     {
-        return $this->db->table('sg_product')->select('*')->where('br_id', session()->get('user_id'))->get()->getResult();
+        return $this->db->table('sg_product')->select('*')->orderBy('pr_id', 'DESC')->getWhere(['br_id' => session()->get('user_id'), 'platform' => $platform])->getResult();
     }
 
     public function addProduct($data)
@@ -41,6 +41,21 @@ class ProductModel extends Model
     public function getProduct($productId)
     {
         return $this->db->table('sg_product')->select('*')->where('pr_id', $productId)->get()->getRow();
+    }
+
+    public function getProductsByParentId($parentId)
+    {
+        return $this->db->table('sg_product')->select('*')->where('parent_product_id', $parentId)->get()->getResult();
+    }
+
+    public function getProductByParentIdandSlug($parentId, $slug)
+    {
+        return $this->db->table('sg_product')->select('*')->getWhere(['parent_product_id' => $parentId, 'slug' => $slug])->getRow();
+    }
+
+    public function getParentProductByName($name)
+    {
+        return $this->db->table('sg_parent_product')->select('*')->where('name', $name)->get()->getRow();
     }
 
     public function getParentProductById($id)

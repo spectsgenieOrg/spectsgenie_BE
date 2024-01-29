@@ -4,6 +4,8 @@
 <script src="<?php echo base_url(); ?>assets/js/jquery.validate.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/additional-methods.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/plugins/select2/js/select2.full.min.js"></script>
+<?php $session = session();
+?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -41,14 +43,10 @@
                                 <label for="inputDescription">Product Description</label>
                                 <textarea id="inputDescription" class="form-control" name="pr_description" rows="4"><?php echo $product->pr_description; ?></textarea>
                             </div>
-                            <div class="form-group">
-                                <label for="inputImages">Product Images</label>
-                                <input type="file" multiple id="inputImages" name="images[]" class="form-control">
-                            </div>
                         </div>
-                        <!-- /.card-body -->
+
                     </div>
-                    <!-- /.card -->
+
                 </div>
 
             </div>
@@ -57,6 +55,10 @@
                 <div class="col-md-6">
                     <div class="card card-primary">
                         <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputImages">Product Images</label>
+                                <input type="file" multiple id="inputImages" name="images[]" class="form-control">
+                            </div>
                             <div class="form-group">
                                 <label for="inputSku">Product SKU</label>
                                 <input type="text" id="inputSku" name="pr_sku" value="<?php echo $product->pr_sku; ?>" class="form-control">
@@ -70,14 +72,21 @@
                                 <input id="inputSalePrice" type="number" class="form-control" value="<?php echo $product->pr_sprice; ?>" name="pr_sprice" />
                             </div>
                         </div>
-                        <!-- /.card-body -->
                     </div>
-                    <!-- /.card -->
                 </div>
 
                 <div class="col-md-6">
                     <div class="card card-primary">
                         <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputImages">Product Platform (Online/Store/Both)</label>
+                                <select class="form-control" data-placeholder="Select a platform" name="platform" id="inputPlatform">
+                                    <option disabled selected>Select a platform</option>
+                                    <option <?php echo $product->platform === 'online' ? 'selected' : ''; ?> value="online">Online</option>
+                                    <option <?php echo $product->platform === 'store' ? 'selected' : ''; ?> value="store">Store</option>
+                                    <option <?php echo $product->platform === 'both' ? 'selected' : ''; ?> value="both">Both</option>
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <label for="inputSgPrice">Product SG Price</label>
                                 <input type="number" id="inputSgPrice" value="<?php echo $product->pr_price; ?>" name="pr_price" class="form-control">
@@ -105,14 +114,77 @@
                                 </select>
                             </div>
                         </div>
-                        <!-- /.card-body -->
+
                     </div>
-                    <!-- /.card -->
+
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-4">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputASize">A Size</label>
+                                <input type="number" id="inputASize" name="pr_a_size" value="<?php echo $product->pr_a_size;
+                                                                                                ?>" class="form-control">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputBSize">B Size</label>
+                                <input type="number" id="inputBSize" name="pr_b_size" value="<?php echo $product->pr_b_size;
+                                                                                                ?>" class="form-control">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputASize">D Size</label>
+                                <input type="number" id="inputDSize" name="pr_d_size" value="<?php echo $product->pr_d_size;
+                                                                                                ?>" class="form-control">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <input type="hidden" name="br_id" value="<?php echo $session->get('user_id'); ?>" />
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="lenstype">Choose Lens types</label>
+                                <select class="form-control select2" multiple="multiple" data-placeholder="Select lens type(s)" data-dropdown-css-class="select2-purple" name="lens_type_ids[]" id="lenstype">
+                                    <?php foreach ($lensTypes as $lensType) : ?>
+
+                                        <option value="<?php echo $lensType->id; ?>"><?php echo $lensType->name; ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -127,11 +199,11 @@
                                 </select>
                             </div>
                         </div>
-                        <!-- /.card-body -->
+
                     </div>
-                    <!-- /.card -->
+
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -144,12 +216,12 @@
                                 </select>
                             </div>
                         </div>
-                        <!-- /.card-body -->
+
                     </div>
-                    <!-- /.card -->
+
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -158,15 +230,14 @@
                                     <option value="1" <?php if ($product->pr_status === "1") {
                                                             echo "selected";
                                                         } ?>>Active</option>
-                                    <option class="0" <?php if ($product->pr_status === "0") {
+                                    <option value="0" <?php if ($product->pr_status === "0") {
                                                             echo "selected";
                                                         } ?>>InActive</option>
                                 </select>
                             </div>
                         </div>
-                        <!-- /.card-body -->
+
                     </div>
-                    <!-- /.card -->
                 </div>
             </div>
 
@@ -207,10 +278,15 @@
             pr_qty: "required",
             pr_sprice: "required",
             bd_id: "required",
+            platform: "required",
             ca_id: "required",
             parent_product_id: "required",
-            sg_gender_ids: "required",
-            images: "required"
+            "sg_gender_ids[]": "required",
+            images: "required",
+            pr_a_size: "required",
+            pr_b_size: "required",
+            pr_d_size: "required",
+            "lens_type_ids[]": "required",
         },
         submitHandler: function(form) {
             const data = [...new FormData(form)];
@@ -233,7 +309,8 @@
         }
     });
 
-    let selectedGenders = [];
+    let selectedGenders = [],
+        selectedLensTypes = [];
 
     <?php
     $genderSplit = explode(",", $product->sg_gender_ids);
@@ -242,6 +319,13 @@
         selectedGenders.push("<?php echo $genderSplit[$i]; ?>");
     <?php } ?>
 
+    <?php
+    $lensTypeSplit = explode(",", $product->lens_type_ids);
+    for ($j = 0; $j < count($lensTypeSplit); $j++) {
+    ?>
+        selectedLensTypes.push("<?php echo $lensTypeSplit[$j]; ?>");
+    <?php } ?>
     $('.select2').select2();
-    $('.select2').val(selectedGenders).trigger('change');
+    $('#inputGender').val(selectedGenders).trigger('change');
+    $('#lenstype').val(selectedLensTypes).trigger('change');
 </script>

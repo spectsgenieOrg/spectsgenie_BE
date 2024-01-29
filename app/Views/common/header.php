@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AdminLTE 3 | DataTables</title>
+    <title>SpectsGenie Admin</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -178,10 +178,10 @@ $roles = [];
             <!-- Main Sidebar Container -->
             <aside class="main-sidebar sidebar-dark-primary elevation-4">
                 <!-- Brand Logo -->
-                <a href="../../index3.html" class="brand-link">
+                <!-- <a href="../../index3.html" class="brand-link">
                     <img src="<?php echo base_url(); ?>assets/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                     <span class="brand-text font-weight-light">AdminLTE 3</span>
-                </a>
+                </a> -->
 
                 <!-- Sidebar -->
                 <div class="sidebar">
@@ -250,7 +250,38 @@ $roles = [];
                                     <li class="nav-item">
                                         <a href="/products/all" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
-                                            <p>View all products</p>
+                                            <p>View online products</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="/products/offline" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>View offline products</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-genderless"></i>
+                                    <p>
+                                        Lens Type
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/lenstype/add" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Add a lens type</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/lenstype/all" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>View all</p>
                                         </a>
                                     </li>
                                 </ul>
