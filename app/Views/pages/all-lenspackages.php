@@ -5,12 +5,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Lens Types</h1>
+                    <h1>Lens Packages</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Lens Types</li>
+                        <li class="breadcrumb-item active">Lens Packages</li>
                     </ol>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">List of all lens types</h3>
+                            <h3 class="card-title">List of all lens packages</h3>
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
@@ -34,25 +34,27 @@
                                         <th>Sl. No</th>
                                         <th>Name</th>
                                         <th>Description</th>
-                                        <th>Icon</th>
+                                        <th>Price</th>
+                                        <th>Label</th>
+                                        <th>Is Membership shown?</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php $i = 0;
                                     $i++; ?>
-                                    <?php foreach ($lensTypes as $lensType) : ?>
+                                    <?php foreach ($lensPackages as $package) : ?>
                                         <tr>
                                             <td><?php echo $i++; ?></td>
-                                            <td><?php echo $lensType->name; ?>
+                                            <td><?php echo $package->name; ?>
                                             </td>
-                                            <td><?php echo $lensType->description; ?></td>
-                                            <td><?php if ($lensType->icon === "") {
-                                                    echo "";
-                                                } else { ?><img style="width: 150px; height: 150px; object-fit:cover;" src="<?php echo base_url() . $lensType->icon; ?>" alt="" /><?php } ?></td>
+                                            <td><?php echo $package->description; ?></td>
+                                            <td><?php echo $package->price === "0" ? "Free" : $package->price; ?></td>
+                                            <td><?php echo $package->label; ?></td>
+                                            <td><?php echo $package->show_gold_membership; ?></td>
                                             <td>
                                                 <div>
-                                                    <a href="<?php echo base_url() . 'lenstype/edit/' . $lensType->id; ?>"><i class="fas fa-pencil-alt"></i></a>
+                                                    <a href="<?php echo base_url() . 'lenspackage/edit/' . $package->id; ?>"><i class="fas fa-pencil-alt"></i></a>
                                                 </div>
                                             </td>
                                         </tr>

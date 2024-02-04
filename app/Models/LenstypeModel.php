@@ -27,4 +27,9 @@ class LenstypeModel extends Model
     {
         return $this->db->table('sg_lens_type')->select('*')->where('id', $lensTypeId)->get()->getRow();
     }
+
+    public function updateLensType($data, $id)
+    {
+        return $this->db->table('sg_lens_type')->where('id', $id)->update($data) ? true : false;
+    }
 }

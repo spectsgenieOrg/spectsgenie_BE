@@ -11,12 +11,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Add lens type</h1>
+                    <h1>Edit lens type</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Add a lens type</li>
+                        <li class="breadcrumb-item active">Edit a lens type</li>
                     </ol>
                 </div>
             </div>
@@ -31,11 +31,11 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="inputName">Lens type name</label>
-                                <input type="text" id="inputName" name="name" class="form-control">
+                                <input type="text" id="inputName" name="name" class="form-control" value="<?php echo $lensType->name; ?>">
                             </div>
                             <div class="form-group">
                                 <label for="inputDescription">Description</label>
-                                <textarea class="form-control" id="inputDescription" name="description" rows="4"></textarea>
+                                <textarea class="form-control" id="inputDescription" name="description" rows="4"><?php echo $lensType->description; ?></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="inputDescription">Icon</label>
@@ -75,12 +75,11 @@
         rules: {
             name: "required",
             description: "required",
-            icon: "required",
             "lens_package_ids[]": "required",
         },
         submitHandler: function(form) {
             $.ajax({
-                url: '<?php echo base_url(); ?>lenstype/addlenstype',
+                url: '<?php echo base_url(); ?>lenstype/update/<?php echo $lensType->id; ?>',
                 type: 'POST',
                 data: new FormData(form),
                 dataType: 'json',
@@ -97,4 +96,15 @@
             });
         }
     });
+
+    let selectedLensPackages = [];
+
+    <?php
+    $lensPackageSplit = explode(",", $lensType->lens_package_ids);
+    ?>
+    <?php for ($i = 0; $i < count($lensPackageSplit); $i++) { ?>
+        selectedLensPackages.push("<?php echo $lensPackageSplit[$i]; ?>");
+    <?php } ?>
+
+    $('#inputLensPackage').val(selectedLensPackages).trigger('change');
 </script>

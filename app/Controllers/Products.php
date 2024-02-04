@@ -169,6 +169,7 @@ class Products extends BaseController
         $images = "";
         $gender = "";
         $lensTypeIds = "";
+        $areImagesSet = false;
         $post = $this->request->getVar();
         foreach ($post['sg_gender_ids'] as $gen) {
             $gender .= $gen . ",";
@@ -190,13 +191,18 @@ class Products extends BaseController
                     $newName = $file->getRandomName();
                     $images .= 'uploads/' . $newName . ',';
                     $file->move(ROOTPATH . 'public/uploads', $newName);
+                    $areImagesSet = true;
                 }
             }
         }
 
-        $imgList = rtrim($images, ',');
+        if ($areImagesSet) {
+            $imgList = rtrim($images, ',');
 
-        $post['pr_image'] = $imgList;
+            $post['pr_image'] = $imgList;
+        }
+
+
         $post['sg_gender_ids'] = $gender;
         $post['lens_type_ids'] = $lensTypeIds;
 

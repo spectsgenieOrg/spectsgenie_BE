@@ -288,6 +288,30 @@ $roles = [];
                             </li>
 
                             <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-genderless"></i>
+                                    <p>
+                                        Lens Packages
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/lenspackage/add" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Add a lens package</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/lenspackage/all" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>View all</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item">
                                 <a href="/logout" class="nav-link cursor">
                                     <i class="nav-icon fas fa-sign-out-alt"></i>
                                     <p>

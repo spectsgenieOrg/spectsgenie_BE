@@ -1,8 +1,5 @@
-<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2/css/select2.min.css">
-<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 <script src="<?php echo base_url(); ?>assets/js/jquery.validate.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/additional-methods.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/plugins/select2/js/select2.full.min.js"></script>
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -11,12 +8,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Add lens type</h1>
+                    <h1>Add lens package</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Add a lens type</li>
+                        <li class="breadcrumb-item active">Add a lens package</li>
                     </ol>
                 </div>
             </div>
@@ -24,30 +21,37 @@
     </section>
     <!-- Main content -->
     <section class="content">
-        <form id="addLenstypeForm" class="sgForm">
+        <form id="addLensPackageForm" class="sgForm">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="inputName">Lens type name</label>
+                                <label for="inputName">Lens package name</label>
                                 <input type="text" id="inputName" name="name" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="inputDescription">Description</label>
+                                <label for="inputDescription">Description (Detail list)</label>
                                 <textarea class="form-control" id="inputDescription" name="description" rows="4"></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="inputDescription">Icon</label>
-                                <input class="form-control" name="icon" type="file" />
+                                <label for="inputPrice">Price</label>
+                                <input class="form-control" name="price" type="number" />
                             </div>
+
                             <div class="form-group">
-                                <label for="inputLensPackage">Choose lens packages under this lens type</label>
-                                <select class="form-control select2" multiple="multiple" data-placeholder="Select lens package type(s)" data-dropdown-css-class="select2-purple" name="lens_package_ids[]" id="inputLensPackage">
-                                    <?php foreach ($lensPackages as $lensPackage) : ?>
-                                        <option value="<?php echo $lensPackage->id; ?>"><?php echo $lensPackage->name; ?></option>
-                                    <?php endforeach ?>
-                                </select>
+                                <label for="inputLabel">Label(Eg: Maximum Eye Protection)</label>
+                                <input class="form-control" name="label" type="text" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputLabel">Do you want to show membership at the bottom?</label>
+                                <br />
+                                <input type="radio" id="yesMembership" name="show_gold_membership" value="yes" />
+                                <label for="yesMembership">Yes</label>
+
+                                <input type="radio" id="noMembership" name="show_gold_membership" value="no" />
+                                <label for="noMembership">No</label>
                             </div>
                         </div>
                         <!-- /.card-body -->
@@ -60,38 +64,50 @@
             <div class="row">
                 <div class="col-12">
                     <a href="#" class="btn btn-secondary">Cancel</a>
-                    <input type="submit" value="Create new lens type" class="btn btn-success float-right">
+                    <input type="submit" value="Create new lens package" class="btn btn-success float-right">
                 </div>
             </div>
         </form>
     </section>
 </div>
-
 <script>
-    $('.select2').select2();
-    $("#addLenstypeForm").submit(function(event) {
+    function convertFormToJSON(form) {
+        return $(form)
+            .serializeArray()
+            .reduce(function(json, {
+                name,
+                value
+            }) {
+                json[name] = value;
+                return json;
+            }, {});
+    }
+
+    $("#addLensPackageForm").submit(function(event) {
         event.preventDefault();
     }).validate({
         rules: {
             name: "required",
+            price: "required",
             description: "required",
-            icon: "required",
-            "lens_package_ids[]": "required",
+            show_membership: "required",
         },
         submitHandler: function(form) {
+            const data = [...new FormData(form)];
+            let obj = {};
+            data.forEach((value) => {
+                obj[value[0]] = value[1]
+            });
             $.ajax({
-                url: '<?php echo base_url(); ?>lenstype/addlenstype',
+                url: '<?php echo base_url(); ?>lenspackage/addlenspackage',
                 type: 'POST',
-                data: new FormData(form),
+                data: JSON.stringify(obj),
                 dataType: 'json',
-                processData: false,
-                contentType: false,
                 success: function(as) {
                     if (as.status == true) {
-                        alert(as.message);
-                        location.reload();
+                        //location.href = "products/all";
                     } else if (as.status == false) {
-                        alert(as.message);
+                        alert("Wrong Email or Password");
                     }
                 }
             });
