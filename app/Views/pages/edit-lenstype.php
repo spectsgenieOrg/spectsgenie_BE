@@ -1,8 +1,6 @@
-<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2/css/select2.min.css">
-<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 <script src="<?php echo base_url(); ?>assets/js/jquery.validate.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/additional-methods.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/plugins/select2/js/select2.full.min.js"></script>
+
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -41,14 +39,6 @@
                                 <label for="inputDescription">Icon</label>
                                 <input class="form-control" name="icon" type="file" />
                             </div>
-                            <div class="form-group">
-                                <label for="inputLensPackage">Choose lens packages under this lens type</label>
-                                <select class="form-control select2" multiple="multiple" data-placeholder="Select lens package type(s)" data-dropdown-css-class="select2-purple" name="lens_package_ids[]" id="inputLensPackage">
-                                    <?php foreach ($lensPackages as $lensPackage) : ?>
-                                        <option value="<?php echo $lensPackage->id; ?>"><?php echo $lensPackage->name; ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -60,7 +50,7 @@
             <div class="row">
                 <div class="col-12">
                     <a href="#" class="btn btn-secondary">Cancel</a>
-                    <input type="submit" value="Create new lens type" class="btn btn-success float-right">
+                    <input type="submit" value="Update lens type" class="btn btn-success float-right">
                 </div>
             </div>
         </form>
@@ -68,14 +58,12 @@
 </div>
 
 <script>
-    $('.select2').select2();
     $("#addLenstypeForm").submit(function(event) {
         event.preventDefault();
     }).validate({
         rules: {
             name: "required",
             description: "required",
-            "lens_package_ids[]": "required",
         },
         submitHandler: function(form) {
             $.ajax({
@@ -96,15 +84,4 @@
             });
         }
     });
-
-    let selectedLensPackages = [];
-
-    <?php
-    $lensPackageSplit = explode(",", $lensType->lens_package_ids);
-    ?>
-    <?php for ($i = 0; $i < count($lensPackageSplit); $i++) { ?>
-        selectedLensPackages.push("<?php echo $lensPackageSplit[$i]; ?>");
-    <?php } ?>
-
-    $('#inputLensPackage').val(selectedLensPackages).trigger('change');
 </script>

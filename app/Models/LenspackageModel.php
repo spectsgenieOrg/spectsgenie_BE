@@ -27,4 +27,13 @@ class LenspackageModel extends Model
     {
         return $this->db->table('sg_lens_package')->select('*')->where('id', $lensPackageId)->get()->getRow();
     }
+
+    public function updateLensPackage($data, $id)
+    {
+        return $this->db->table('sg_lens_package')->where('id', $id)->update($data) ? true : false;
+    }
+
+    public function getLensPackageByLensTypeID($lensTypeID) {
+        return $this->db->table('sg_lens_package')->like('lens_type_ids', $lensTypeID)->get()->getResult();
+    }
 }

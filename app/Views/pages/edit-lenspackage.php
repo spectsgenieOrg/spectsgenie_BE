@@ -1,5 +1,8 @@
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 <script src="<?php echo base_url(); ?>assets/js/jquery.validate.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/js/additional-methods.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/plugins/select2/js/select2.full.min.js"></script>
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -57,6 +60,15 @@
                                                                                                     } ?> value="no" />
                                 <label for="noMembership">No</label>
                             </div>
+
+                            <div class="form-group">
+                                <label for="inputLensTypes">Choose lens types this lens package would be applicable for:</label>
+                                <select class="form-control select2" multiple="multiple" data-placeholder="Select lens types" data-dropdown-css-class="select2-purple" name="lens_type_ids[]" id="inputLensTypes">
+                                    <?php foreach ($lensTypes as $lensType) : ?>
+                                        <option value="<?php echo $lensType->uid; ?>"><?php echo $lensType->name; ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -68,24 +80,25 @@
             <div class="row">
                 <div class="col-12">
                     <a href="#" class="btn btn-secondary">Cancel</a>
-                    <input type="submit" value="Update new lens package" class="btn btn-success float-right">
+                    <input type="submit" value="Update lens package" class="btn btn-success float-right">
                 </div>
             </div>
         </form>
     </section>
 </div>
 <script>
-    function convertFormToJSON(form) {
-        return $(form)
-            .serializeArray()
-            .reduce(function(json, {
-                name,
-                value
-            }) {
-                json[name] = value;
-                return json;
-            }, {});
-    }
+    $('.select2').select2();
+
+    let selectedLensTypes = [];
+
+    <?php
+    $lensTypeSplit = explode(",", $lensPackage->lens_type_ids);
+    for ($j = 0; $j < count($lensTypeSplit); $j++) {
+    ?>
+        selectedLensTypes.push("<?php echo $lensTypeSplit[$j]; ?>");
+    <?php } ?>
+
+    $('#inputLensTypes').val(selectedLensTypes).trigger('change');
 
     $("#addLensPackageForm").submit(function(event) {
         event.preventDefault();
@@ -95,21 +108,20 @@
             price: "required",
             description: "required",
             show_membership: "required",
+            "lens_type_ids[]": "required",
         },
         submitHandler: function(form) {
-            const data = [...new FormData(form)];
-            let obj = {};
-            data.forEach((value) => {
-                obj[value[0]] = value[1]
-            });
+
             $.ajax({
-                url: '<?php echo base_url(); ?>lenspackage/addlenspackage',
+                url: '<?php echo base_url(); ?>lenspackage/update/<?php echo $lensPackage->id; ?>',
                 type: 'POST',
-                data: JSON.stringify(obj),
+                data: new FormData(form),
                 dataType: 'json',
+                processData: false,
+                contentType: false,
                 success: function(as) {
                     if (as.status == true) {
-                        //location.href = "products/all";
+                        alert('Lens package updated successfully');
                     } else if (as.status == false) {
                         alert("Wrong Email or Password");
                     }

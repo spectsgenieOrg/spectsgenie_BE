@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\LenspackageModel;
+use App\Models\LenstypeModel;
 
 class Lenspackage extends BaseController
 {
@@ -16,8 +17,13 @@ class Lenspackage extends BaseController
 
     public function add()
     {
+        $db = db_connect();
+
+        $lensTypeModel = new LenstypeModel($db);
+        $data['lensTypes'] = $lensTypeModel->allLensTypes();
+
         return view('common/header')
-            . view('pages/add-lenspackage')
+            . view('pages/add-lenspackage', $data)
             . view('common/footer');
     }
 
@@ -25,6 +31,8 @@ class Lenspackage extends BaseController
     {
         $db = db_connect();
         $lensPackageModel = new LensPackageModel($db);
+        $lensTypeModel = new LenstypeModel($db);
+        $data['lensTypes'] = $lensTypeModel->allLensTypes();
         $lensPackage = $lensPackageModel->getLensPackageById($id);
         $data['lensPackage'] = $lensPackage;
         return view('common/header')
@@ -51,7 +59,16 @@ class Lenspackage extends BaseController
     {
         $db = db_connect();
         $lensPackageModel = new LensPackageModel($db);
-        $post = json_decode($this->request->getBody());
+        $post = $this->request->getVar();
+        $lensTypes = "";
+        foreach ($post['lens_type_ids'] as $lt) {
+            $lensTypes .= $lt . ",";
+        }
+
+        $lensTypes = rtrim($lensTypes, ',');
+
+        $post['lens_type_ids'] = $lensTypes;
+
         $isLensPackageAdded = $lensPackageModel->addLensPackage($post);
 
         $response = array("status" => $isLensPackageAdded, "message" => $isLensPackageAdded ? "Lens package added successfully" : "Error occurred while creating");
@@ -79,4 +96,36 @@ class Lenspackage extends BaseController
         $response = array("status" => count($lensPackages) > 0, "message" => count($lensPackages) > 0 ? "Lens package list" : "Lens package list not available", "data" => $lensPackages);
         echo json_encode($response);
     }
+
+    // Update package
+    public function update($id)
+    {
+        $db = db_connect();
+
+        $lensPackageModel = new LensPackageModel($db);
+
+        $post = $this->request->getVar();
+        $lensTypes = "";
+        foreach ($post['lens_type_ids'] as $lt) {
+            $lensTypes .= $lt . ",";
+        }
+
+        $lensTypes = rtrim($lensTypes, ',');
+
+        $post['lens_type_ids'] = $lensTypes;
+
+        $isSaved = $lensPackageModel->updateLensPackage($post, $id);
+
+        $response = array("status" => $isSaved, "message" => $isSaved ? "Lens package updated successfully" : "Error occurred while updating");
+
+        echo json_encode($response);
+    }
+
+    // Get Lens packages by Lens type ID
+    // public function getlenspackagebylenstypeid($lensTypeId) {
+    //     $db = db_connect();
+
+    //     $lensTypeModel = new LenstypeModel($db);
+    //     $lensTypeData = 
+    // }
 }

@@ -41,14 +41,6 @@
                                 <label for="inputDescription">Icon</label>
                                 <input class="form-control" name="icon" type="file" />
                             </div>
-                            <div class="form-group">
-                                <label for="inputLensPackage">Choose lens packages under this lens type</label>
-                                <select class="form-control select2" multiple="multiple" data-placeholder="Select lens package type(s)" data-dropdown-css-class="select2-purple" name="lens_package_ids[]" id="inputLensPackage">
-                                    <?php foreach ($lensPackages as $lensPackage) : ?>
-                                        <option value="<?php echo $lensPackage->id; ?>"><?php echo $lensPackage->name; ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -76,7 +68,6 @@
             name: "required",
             description: "required",
             icon: "required",
-            "lens_package_ids[]": "required",
         },
         submitHandler: function(form) {
             $.ajax({

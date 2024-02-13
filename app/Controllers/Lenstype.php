@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Models\LenspackageModel;
 use App\Models\LenstypeModel;
+use Exception;
+
 
 class Lenstype extends BaseController
 {
@@ -15,16 +17,27 @@ class Lenstype extends BaseController
         header('Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE');
     }
 
+    function uniqidReal($lenght = 13)
+    {
+        // uniqid gives 13 chars, but you could adjust it to your needs.
+        if (function_exists("random_bytes")) {
+            $bytes = random_bytes(ceil($lenght / 2));
+        } elseif (function_exists("openssl_random_pseudo_bytes")) {
+            $bytes = openssl_random_pseudo_bytes(ceil($lenght / 2));
+        } else {
+            throw new Exception("no cryptographically secure random function available");
+        }
+        return substr(bin2hex($bytes), 0, $lenght);
+    }
+
     public function add()
     {
         $db = db_connect();
 
         $lensPackageModel = new LenspackageModel($db);
 
-        $data["lensPackages"] = $lensPackageModel->allLensPackages();
-
         return view('common/header')
-            . view('pages/add-lenstype', $data)
+            . view('pages/add-lenstype')
             . view('common/footer');
     }
 
@@ -47,8 +60,7 @@ class Lenstype extends BaseController
         $db = db_connect();
 
         $lensTypeModel = new LenstypeModel($db);
-        $lensPackageModel = new LenspackageModel($db);
-        $data = array("lensType" => $lensTypeModel->getLensTypeById($id), "lensPackages" => $lensPackageModel->allLensPackages());
+        $data = array("lensType" => $lensTypeModel->getLensTypeById($id));
 
         return view('common/header') . view('pages/edit-lenstype', $data) . view('common/footer');
     }
@@ -64,13 +76,7 @@ class Lenstype extends BaseController
         $post = $this->request->getVar();
 
         $image = "";
-        $lensPackageIds = "";
 
-        foreach ($post['lens_package_ids'] as $package) {
-            $lensPackageIds .= $package . ",";
-        }
-
-        $lensPackageIds = rtrim($lensPackageIds, ',');
 
         if ($this->request->getFile('icon')) {
             $file = $this->request->getFile('icon');
@@ -83,7 +89,7 @@ class Lenstype extends BaseController
         }
 
         $post['icon'] = $image;
-        $post['lens_package_ids'] = $lensPackageIds;
+        $post['uid'] = $this->uniqidReal();
 
 
         $post = json_decode(json_encode($post));
@@ -104,13 +110,6 @@ class Lenstype extends BaseController
         $post = $this->request->getVar();
 
         $image = "";
-        $lensPackageIds = "";
-
-        foreach ($post['lens_package_ids'] as $package) {
-            $lensPackageIds .= $package . ",";
-        }
-
-        $lensPackageIds = rtrim($lensPackageIds, ',');
 
 
         if ($this->request->getFile('icon')) {
@@ -123,8 +122,6 @@ class Lenstype extends BaseController
                 $post['icon'] = $image;
             }
         }
-
-        $post['lens_package_ids'] = $lensPackageIds;
 
 
         $post = json_decode(json_encode($post));

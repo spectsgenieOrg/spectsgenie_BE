@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\LenspackageModel;
 use App\Models\LenstypeModel;
 use App\Models\ProductModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -252,6 +253,7 @@ class Products extends BaseController
 
         $productModel = new ProductModel($db);
         $lensTypeModel = new LenstypeModel($db);
+        $lensPackageModel = new LenspackageModel($db);
 
         $parentProduct = $productModel->getParentProductByName($parentName);
 
@@ -275,7 +277,10 @@ class Products extends BaseController
 
             $lensTypeIndex = 0;
             foreach ($lensTypeForCurrentProduct as $lensTypeID) {
+                
                 $lensTypeForCurrentProduct[$lensTypeIndex] = $lensTypeModel->getLensTypeById($lensTypeID);
+
+                $lensTypeForCurrentProduct[$lensTypeIndex]->packages = $lensPackageModel->getLensPackageByLensTypeID($lensTypeID);
                 $lensTypeForCurrentProduct[$lensTypeIndex]->icon = $this->baseURL . $lensTypeForCurrentProduct[$lensTypeIndex]->icon;
                 $lensTypeIndex++;
             }
@@ -283,7 +288,6 @@ class Products extends BaseController
         } else {
             $currentProduct->lens_types = [];
         }
-
 
         $productsBySameParent = $productModel->getProductsByParentId($parentProduct->id);
 
@@ -307,6 +311,7 @@ class Products extends BaseController
                 $lenstypeidx = 0;
                 foreach ($lensTypeForProduct as $ltID) {
                     $lensTypeForProduct[$lenstypeidx] = $lensTypeModel->getLensTypeById($ltID);
+                    $lensTypeForProduct[$lenstypeidx]->packages = $lensPackageModel->getLensPackageByLensTypeID($ltID);
                     $lensTypeForProduct[$lenstypeidx]->icon = $this->baseURL . $lensTypeForProduct[$lenstypeidx]->icon;
                     $lenstypeidx++;
                 }
