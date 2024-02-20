@@ -92,4 +92,9 @@ class ProductModel extends Model
     {
         return $this->db->table('sg_category')->select('*')->where('ca_id', $categoryId)->get()->getRow();
     }
+
+    public function getGroupedParentByProductID($productId)
+    {
+        return $this->db->table('sg_product as sp')->join('sg_parent_product as pp', 'sp.parent_product_id = pp.id')->select('pp.id as parent_product_id, pp.name as parent_product_name')->where('sp.pr_id', $productId)->groupBy('pp.id, pp.name')->get()->getRow();
+    }
 }

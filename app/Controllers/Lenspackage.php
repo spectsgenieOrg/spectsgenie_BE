@@ -122,10 +122,19 @@ class Lenspackage extends BaseController
     }
 
     // Get Lens packages by Lens type ID
-    // public function getlenspackagebylenstypeid($lensTypeId) {
-    //     $db = db_connect();
+    public function getlenspackagebylenstypeid($lensTypeId)
+    {
+        $db = db_connect();
 
-    //     $lensTypeModel = new LenstypeModel($db);
-    //     $lensTypeData = 
-    // }
+        $lensPackageModel = new LenspackageModel($db);
+        $lensPackages =  $lensPackageModel->getLensPackageByLensTypeID($lensTypeId);
+
+        if ($lensPackages) {
+            $response = array('status' => true, 'message' => 'Lens package list', 'data' => $lensPackages);
+        } else {
+            $response = array('status' => false, 'message' => 'Lens package list not available for this lens type');
+        }
+
+        echo json_encode($response);
+    }
 }

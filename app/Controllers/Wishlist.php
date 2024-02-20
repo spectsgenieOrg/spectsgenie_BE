@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Models\ProductModel;
+use App\Models\WishlistModel;
+
+class Wishlist extends BaseController
+{
+    public function __construct()
+    {
+        header('Content-Type: application/json');
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Headers: access_token, Cache-Control, Content-Type');
+        header('Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE');
+    }
+
+    public function add()
+    {
+        $db = db_connect();
+
+        $wishlist = new WishlistModel($db);
+
+        $post = json_decode($this->request->getBody());
+        $isProductAlreadyInWishlist = !is_null($wishlist->getWishlistByCustomerAndProductId($post->customer_id, $post->product_id));
+
+        if ($isProductAlreadyInWishlist) {
+            $response = array("message" => "Product already in wishlist", "status" => false);
+        } else {
+            $post->is_active = "true";
+
+            $data = $wishlist->addWishlist($post);
+
+            if ($data) {
+                $response = array("message" => "Product added to wishlist", "status" => true, "data" => $post);
+            } else {
+                $response = array("message" => "Product not added to wishlist", "status" => false);
+            }
+        }
+
+
+        echo json_encode($response);
+    }
+
+    public function user($customerId)
+    {
+        $db = db_connect();
+
+        $wishlistModel = new WishlistModel($db);
+
+        $customerWishlists = $wishlistModel->getWishlistsByCustomerId($customerId);
+
+        if ($customerWishlists) {
+            $productModel = new ProductModel($db);
+            foreach ($customerWishlists as $wishlist) {
+                $parentProduct = $productModel->getGroupedParentByProductID($wishlist->product_id);
+                $product = array($productModel->getProduct($wishlist->product_id));
+                $parentProduct->products = $product;
+                $wishlist->parent_product = $parentProduct;
+            }
+            $response = array('message' => 'Products list that are added in wishlist', 'data' => $customerWishlists, 'status' => true);
+        } else {
+            $response = array('message' => 'Wishlist is empty', 'status' => false);
+        }
+
+
+        echo json_encode($response);
+    }
+}
