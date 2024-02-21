@@ -3,11 +3,15 @@
 namespace App\Controllers;
 
 use App\Models\Authentication;
+use App\Libraries\ImplementJWT as GlobalImplementJWT;
 
 class Customer extends BaseController
 {
+    protected $objOfJwt;
+
     public function __construct()
     {
+        $this->objOfJwt = new GlobalImplementJWT();
         header('Content-Type: application/json');
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Headers: access_token, Cache-Control, Content-Type');
@@ -65,7 +69,8 @@ class Customer extends BaseController
         $data = $auth->customerlogin($post->email, $post->password);
 
         if ($data) {
-            echo json_encode(['status' => true, 'customer_data' => $data, 'message' => 'Successful Login']);
+            $token = $this->objOfJwt->GenerateToken($data);
+            echo json_encode(['status' => true, 'auth_token' => $token, 'message' => 'Successful Login']);
         } else {
             echo json_encode(['status' => false, 'message' => 'Unsuccessful Login']);
         }
@@ -77,15 +82,28 @@ class Customer extends BaseController
 
         $auth = new Authentication($db);
 
-        $post = json_decode($this->request->getBody());
+        if ($this->request->hasHeader('Authorization')) {
+            $token = $this->request->header('Authorization')->getValue();
+            $data = $this->objOfJwt->DecodeToken($token);
 
-        $isSaved = $auth->updateProfile($post, $id);
+            if ($id === $data['id']) {
+                $post = json_decode($this->request->getBody());
 
-        if ($isSaved) {
-            $response = array("status" => true, "message" => "Profile successfully updated", "data" => $post);
+                $isSaved = $auth->updateProfile($post, $id);
+
+                if ($isSaved) {
+                    $response = array("status" => true, "message" => "Profile successfully updated", "data" => $post);
+                } else {
+                    $response = array("status" => false, "message" => "Error occurred while updating profile, please try again", "data" => []);
+                }
+            } else {
+                $response = array("message" => "User is not authorized", "status" => false);
+            }
         } else {
-            $response = array("status" => false, "message" => "Error occurred while updating profile, please try again", "data" => []);
+            $response = array("message" => "Unauthorized access", "status" => false);
         }
+
+
 
         echo json_encode($response);
     }
