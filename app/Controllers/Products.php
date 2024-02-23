@@ -274,16 +274,15 @@ class Products extends BaseController
 
         if ($currentProduct->lens_type_ids !== "") {
             $lensTypeForCurrentProduct = explode(",", $currentProduct->lens_type_ids);
-
             $lensTypeIndex = 0;
             foreach ($lensTypeForCurrentProduct as $lensTypeID) {
-                
                 $lensTypeForCurrentProduct[$lensTypeIndex] = $lensTypeModel->getLensTypeById($lensTypeID);
 
-                $lensTypeForCurrentProduct[$lensTypeIndex]->packages = $lensPackageModel->getLensPackageByLensTypeID($lensTypeID);
+                $lensTypeForCurrentProduct[$lensTypeIndex]->packages = $lensPackageModel->getLensPackageByLensTypeID($lensTypeForCurrentProduct[$lensTypeIndex]->uid);
                 $lensTypeForCurrentProduct[$lensTypeIndex]->icon = $this->baseURL . $lensTypeForCurrentProduct[$lensTypeIndex]->icon;
                 $lensTypeIndex++;
             }
+
             $currentProduct->lens_types = $lensTypeForCurrentProduct;
         } else {
             $currentProduct->lens_types = [];
@@ -291,7 +290,11 @@ class Products extends BaseController
 
         $productsBySameParent = $productModel->getProductsByParentId($parentProduct->id);
 
-        foreach ($productsBySameParent as $product) {
+        $similarProducts = array_filter($productsBySameParent, function ($product) use ($currentProduct) {
+            return $product->pr_id !== $currentProduct->pr_id;
+        });
+
+        foreach ($similarProducts as $product) {
             if ($product->pr_image !== "") {
                 $images = explode(",", $product->pr_image);
                 $i = 0;
@@ -311,7 +314,7 @@ class Products extends BaseController
                 $lenstypeidx = 0;
                 foreach ($lensTypeForProduct as $ltID) {
                     $lensTypeForProduct[$lenstypeidx] = $lensTypeModel->getLensTypeById($ltID);
-                    $lensTypeForProduct[$lenstypeidx]->packages = $lensPackageModel->getLensPackageByLensTypeID($ltID);
+                    $lensTypeForProduct[$lenstypeidx]->packages = $lensPackageModel->getLensPackageByLensTypeID($lensTypeForProduct[$lenstypeidx]->uid);
                     $lensTypeForProduct[$lenstypeidx]->icon = $this->baseURL . $lensTypeForProduct[$lenstypeidx]->icon;
                     $lenstypeidx++;
                 }
@@ -321,7 +324,7 @@ class Products extends BaseController
             }
         }
 
-        $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => $productsBySameParent, "products_count" => count($productsBySameParent));
+        $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => $similarProducts, "similar_products_count" => count($similarProducts));
 
         echo json_encode($response);
     }
