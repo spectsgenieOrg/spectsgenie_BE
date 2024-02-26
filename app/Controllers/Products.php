@@ -324,9 +324,9 @@ class Products extends BaseController
             }
         }
 
-        $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => $similarProducts, "similar_products_count" => count($similarProducts));
+        $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => array_values($similarProducts), "similar_products_count" => count($similarProducts));
 
-        echo json_encode($response);
+       echo json_encode($response);
     }
 
     public function addfromexcel()
