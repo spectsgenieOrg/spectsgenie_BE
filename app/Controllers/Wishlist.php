@@ -14,8 +14,35 @@ class Wishlist extends BaseController
         $this->objOfJwt = new GlobalImplementJWT();
         header('Content-Type: application/json');
         header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Headers: access_token, Cache-Control, Content-Type');
-        header('Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE');
+        header('Access-Control-Allow-Headers: Authorization, Cache-Control, Content-Type');
+        header('Access-Control-Allow-Methods: GET, HEAD, POST, OPTIONS, PUT, DELETE');
+        $method = $_SERVER['REQUEST_METHOD'];
+        if ($method == "OPTIONS") {
+            die();
+        }
+    }
+
+    public $baseURL = 'https://newpos.spectsgenie.com/';
+
+    private function getCategoryName($category)
+    {
+        if (strtolower($category) === "sunglass") {
+            $categoryName = "sunglasses";
+        }
+        if (strtolower($category) === "eyeglass") {
+            $categoryName = "eyeglasses";
+        }
+        if (strtolower($category) === "lens") {
+            $categoryName = "lens";
+        }
+        if (strtolower($category) === "accesories") {
+            $categoryName = "accessories";
+        }
+        if (strtolower($category) === "contact lens") {
+            $categoryName = "contacts";
+        }
+
+        return $categoryName;
     }
 
     public function add()
@@ -54,33 +81,46 @@ class Wishlist extends BaseController
         echo json_encode($response);
     }
 
-    public function user($customerId)
+    public function user()
     {
         $db = db_connect();
 
         $wishlistModel = new WishlistModel($db);
+        $productModel = new ProductModel($db);
 
         if ($this->request->hasHeader('Authorization')) {
             $token = $this->request->header('Authorization')->getValue();
             $data = $this->objOfJwt->DecodeToken($token);
 
-            if ($customerId === $data['id']) {
-                $customerWishlists = $wishlistModel->getWishlistsByCustomerId($customerId);
+            $customerWishlists = $wishlistModel->getWishlistsByCustomerId($data['id']);
 
-                if ($customerWishlists) {
-                    $productModel = new ProductModel($db);
-                    foreach ($customerWishlists as $wishlist) {
-                        $parentProduct = $productModel->getGroupedParentByProductID($wishlist->product_id);
-                        $product = array($productModel->getProduct($wishlist->product_id));
-                        $parentProduct->products = $product;
-                        $wishlist->parent_product = $parentProduct;
+            if ($customerWishlists) {
+                $productModel = new ProductModel($db);
+                foreach ($customerWishlists as $wishlist) {
+                    $parentProduct = $productModel->getGroupedParentByProductID($wishlist->product_id);
+                    $products = array($productModel->getProduct($wishlist->product_id));
+                    foreach ($products as $product) {
+                        if ($product->pr_image !== "") {
+                            $images = explode(",", $product->pr_image);
+                            $i = 0;
+                            foreach ($images as $image) {
+                                $images[$i] = $this->baseURL . $image;
+                                $i++;
+                            }
+
+                            $product->pr_image = $images;
+                        } else {
+                            $product->pr_image = [];
+                        }
                     }
-                    $response = array('message' => 'Products list that are added in wishlist', 'data' => $customerWishlists, 'status' => true);
-                } else {
-                    $response = array('message' => 'Wishlist is empty', 'status' => false);
+                    $category = $productModel->getCategoryDetail($products[0]->ca_id);
+                    $wishlist->category_name = $this->getCategoryName($category->ca_name);
+                    $parentProduct->products = $products;
+                    $wishlist->parent_product = $parentProduct;
                 }
+                $response = array('message' => 'Products list that are added in wishlist', 'data' => $customerWishlists, 'status' => true);
             } else {
-                $response = array("message" => "User is not authorized", "status" => false);
+                $response = array('message' => 'Wishlist is empty', 'status' => false);
             }
         } else {
             $response = array("message" => "Unauthorized access", "status" => false);

@@ -14,8 +14,12 @@ class Customer extends BaseController
         $this->objOfJwt = new GlobalImplementJWT();
         header('Content-Type: application/json');
         header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Headers: access_token, Cache-Control, Content-Type');
-        header('Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE');
+        header('Access-Control-Allow-Headers: Authorization, Cache-Control, Content-Type');
+        header('Access-Control-Allow-Methods: GET, HEAD, POST, OPTIONS, PUT, DELETE');
+        $method = $_SERVER['REQUEST_METHOD'];
+        if ($method == "OPTIONS") {
+            die();
+        }
     }
 
     public function crypt($string, $action)

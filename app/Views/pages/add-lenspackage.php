@@ -49,6 +49,11 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="inputLabel">Lens material(Eg: Polycarbonate)</label>
+                                <input class="form-control" name="lens_material" type="text" />
+                            </div>
+
+                            <div class="form-group">
                                 <label for="inputLabel">Do you want to show membership at the bottom?</label>
                                 <br />
                                 <input type="radio" id="yesMembership" name="show_gold_membership" value="yes" />
@@ -95,6 +100,7 @@
             price: "required",
             description: "required",
             show_membership: "required",
+            lens_material: "required",
             "lens_type_ids[]": "required",
         },
         submitHandler: function(form) {
@@ -107,6 +113,7 @@
                 contentType: false,
                 success: function(as) {
                     if (as.status == true) {
+                        alert("Lens package added");
                         location.reload();
                     } else if (as.status == false) {
                         alert("Something wrong");
