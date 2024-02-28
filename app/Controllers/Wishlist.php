@@ -91,8 +91,9 @@ class Wishlist extends BaseController
         if ($this->request->hasHeader('Authorization')) {
             $token = $this->request->header('Authorization')->getValue();
             $data = $this->objOfJwt->DecodeToken($token);
-
+            $flattenedWishlistArray = [];
             $customerWishlists = $wishlistModel->getWishlistsByCustomerId($data['id']);
+            $flattenedWishlistArray = array_column($customerWishlists, 'product_id');
 
             if ($customerWishlists) {
                 $productModel = new ProductModel($db);
@@ -111,6 +112,11 @@ class Wishlist extends BaseController
                             $product->pr_image = $images;
                         } else {
                             $product->pr_image = [];
+                        }
+                        $product->is_wishlisted = false;
+
+                        if (in_array($product->pr_id, $flattenedWishlistArray)) {
+                            $product->is_wishlisted = true;
                         }
                     }
                     $category = $productModel->getCategoryDetail($products[0]->ca_id);

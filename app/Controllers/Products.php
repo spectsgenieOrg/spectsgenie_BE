@@ -5,17 +5,26 @@ namespace App\Controllers;
 use App\Models\LenspackageModel;
 use App\Models\LenstypeModel;
 use App\Models\ProductModel;
+use App\Models\WishlistModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Libraries\ImplementJWT as GlobalImplementJWT;
 
 class Products extends BaseController
 {
+    protected $objOfJwt;
     public function __construct()
     {
+        $this->objOfJwt = new GlobalImplementJWT();
         header('Content-Type: application/json');
         header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Headers: access_token, Cache-Control, Content-Type');
-        header('Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE');
+        header('Access-Control-Allow-Headers: Authorization, Cache-Control, Content-Type');
+        header('Access-Control-Allow-Methods: GET, HEAD, POST, OPTIONS, PUT, DELETE');
+
+        $method = $_SERVER['REQUEST_METHOD'];
+        if ($method == "OPTIONS") {
+            die();
+        }
     }
 
     public $baseURL = 'https://newpos.spectsgenie.com/';
@@ -223,6 +232,17 @@ class Products extends BaseController
         $productModel = new ProductModel($db);
         $parentProducts = $productModel->getGroupedParentProduct($category, $gender);
 
+        $customerWishlists = [];
+        $flattenedWishlistArray = [];
+
+        if ($this->request->hasHeader('Authorization')) {
+            $token = $this->request->header('Authorization')->getValue();
+            $data = $this->objOfJwt->DecodeToken($token);
+            $wishlistModel = new WishlistModel($db);
+            $customerWishlists = $wishlistModel->getWishlistsByCustomerId($data['id']);
+            $flattenedWishlistArray = array_column($customerWishlists, 'product_id');
+        }
+
         foreach ($parentProducts as $parent) {
             $parent->products = $productModel->getProductByCategoryGenderParent($category, $gender, $parent->parent_product_id);
 
@@ -238,6 +258,14 @@ class Products extends BaseController
                     $product->pr_image = $images;
                 } else {
                     $product->pr_image = [];
+                }
+
+                $product->is_wishlisted = false;
+
+                if (count($customerWishlists) > 0) {
+                    if (in_array($product->pr_id, $flattenedWishlistArray)) {
+                        $product->is_wishlisted = true;
+                    }
                 }
             }
         }
@@ -255,6 +283,17 @@ class Products extends BaseController
         $lensTypeModel = new LenstypeModel($db);
         $lensPackageModel = new LenspackageModel($db);
 
+        $customerWishlists = [];
+        $flattenedWishlistArray = [];
+
+        if ($this->request->hasHeader('Authorization')) {
+            $token = $this->request->header('Authorization')->getValue();
+            $data = $this->objOfJwt->DecodeToken($token);
+            $wishlistModel = new WishlistModel($db);
+            $customerWishlists = $wishlistModel->getWishlistsByCustomerId($data['id']);
+            $flattenedWishlistArray = array_column($customerWishlists, 'product_id');
+        }
+
         $parentProduct = $productModel->getParentProductByName($parentName);
 
         $currentProduct = $productModel->getProductByParentIdandSlug($parentProduct->id, $slug);
@@ -269,6 +308,14 @@ class Products extends BaseController
             $currentProduct->pr_image = $currentProductImages;
         } else {
             $currentProduct->pr_image = [];
+        }
+
+        $currentProduct->is_wishlisted = false;
+
+        if (count($customerWishlists) > 0) {
+            if (in_array($currentProduct->pr_id, $flattenedWishlistArray)) {
+                $currentProduct->is_wishlisted = true;
+            }
         }
 
 
@@ -322,11 +369,18 @@ class Products extends BaseController
             } else {
                 $product->lens_types = [];
             }
+            $product->is_wishlisted = false;
+
+            if (count($customerWishlists) > 0) {
+                if (in_array($product->pr_id, $flattenedWishlistArray)) {
+                    $product->is_wishlisted = true;
+                }
+            }
         }
 
         $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => array_values($similarProducts), "similar_products_count" => count($similarProducts));
 
-       echo json_encode($response);
+        echo json_encode($response);
     }
 
     public function addfromexcel()

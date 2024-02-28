@@ -40,6 +40,11 @@ class Authentication extends Model
         return $this->db->table('sg_customer_online')->select('*')->where('email', $email)->get()->getNumRows() > 0 ? true : false;
     }
 
+    public function getCustomerById($id)
+    {
+        return $this->db->table('sg_customer_online')->select('name, email, mobile')->where('id', $id)->get()->getRow();
+    }
+
     public function customerlogin($email, $password)
     {
         return $this->db->table('sg_customer_online')->select('id, email, mobile')->getWhere(["email" => $email, "password" => $password])->getRow();
