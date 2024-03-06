@@ -13,4 +13,11 @@ $routes->post('/products/update/(:num)', 'Products::update/$1');
 $routes->get('/products/(:num)/(:num)', 'Products::getProductByCategory/$1/$2'); // $1 = category, $2 = gender
 $routes->get('/product/(:alphanum)/(:any)', 'Products::getProductByParentAndSlug/$1/$2'); // $1=parent name, $2=slug
 
+$routes->group('wishlist', static function ($routes) {
+    $routes->post('add', 'Wishlist::add');
+    $routes->get('user', 'Wishlist::user');
+    $routes->get('product/(:num)', 'Wishlist::product/$1');
+    $routes->delete('(:num)', 'Wishlist::delete/$1');
+});
+
 //$routes->post('/lenstype/update/(:num)', 'Products::update/$1');

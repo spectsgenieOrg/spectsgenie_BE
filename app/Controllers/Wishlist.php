@@ -135,4 +135,54 @@ class Wishlist extends BaseController
 
         echo json_encode($response);
     }
+
+    public function delete($id)
+    {
+        $db = db_connect();
+
+        $wishlist = new WishlistModel($db);
+
+        if ($this->request->hasHeader('Authorization')) {
+            $token = $this->request->header('Authorization')->getValue();
+            $data = $this->objOfJwt->DecodeToken($token);
+            $wishlistData = $wishlist->getWishlistById($id);
+            if ($wishlistData) {
+                $isDeleted = $wishlist->deleteWishlistByIdAndCustomerId($id, $data['id'], $db);
+
+                if ($isDeleted === 1) {
+                    $response = array("message" => "Removed the item from the wishlist", "status" => true);
+                } else {
+                    $response = array("message" => "Unfortunately, Item was not removed from wishlist. Please try again.", "status" => false);
+                }
+            } else {
+                $response = array("message" => "Item is not present in the wishlist", "status" => false);
+            }
+        } else {
+            $response = array("message" => "Unauthorized access", "status" => false);
+        }
+
+        echo json_encode($response);
+    }
+
+    public function product($id)
+    {
+        $db = db_connect();
+
+        $wishlist = new WishlistModel($db);
+
+        if ($this->request->hasHeader('Authorization')) {
+            $token = $this->request->header('Authorization')->getValue();
+            $data = $this->objOfJwt->DecodeToken($token);
+            $wishlist = $wishlist->getWishlistByCustomerAndProductId($data['id'], $id);
+
+            if ($wishlist) {
+                $response = array("message" => "This item is added in the wishlist", "is_wishlisted" => true, "wishlist" => $wishlist, "status" => true);
+            } else {
+                $response = array("message" => "This item is not added in the wishlist", "is_wishlisted" => false, "status" => true);
+            }
+        } else {
+            $response = array("message" => "Unauthorized access", "status" => false);
+        }
+        echo json_encode($response);
+    }
 }

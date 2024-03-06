@@ -337,11 +337,11 @@ class Products extends BaseController
 
         $productsBySameParent = $productModel->getProductsByParentId($parentProduct->id);
 
-        $similarProducts = array_filter($productsBySameParent, function ($product) use ($currentProduct) {
-            return $product->pr_id !== $currentProduct->pr_id;
-        });
+        // $similarProducts = array_filter($productsBySameParent, function ($product) use ($currentProduct) {
+        //     return $product->pr_id !== $currentProduct->pr_id;
+        // });
 
-        foreach ($similarProducts as $product) {
+        foreach ($productsBySameParent as $product) {
             if ($product->pr_image !== "") {
                 $images = explode(",", $product->pr_image);
                 $i = 0;
@@ -378,7 +378,7 @@ class Products extends BaseController
             }
         }
 
-        $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => array_values($similarProducts), "similar_products_count" => count($similarProducts));
+        $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => array_values($productsBySameParent), "similar_products_count" => count($productsBySameParent));
 
         echo json_encode($response);
     }

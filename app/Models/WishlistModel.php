@@ -27,4 +27,14 @@ class WishlistModel extends Model
     {
         return $this->db->table('sg_wishlist')->select('*')->getWhere(['customer_id' => $customerId, 'product_id' => $productId, 'is_active' => 'true'])->getRow();
     }
+
+    public function getWishlistById($wishlistId) {
+        return $this->db->table('sg_wishlist')->select('*')->where('id', $wishlistId)->get()->getrow();
+    }
+
+    public function deleteWishlistByIdAndCustomerId($wishlistId, $customerId, $db)
+    {
+        $this->db->table('sg_wishlist')->where(['id' => $wishlistId, 'customer_id' => $customerId])->delete();
+        return $db->affectedRows();
+    }
 }

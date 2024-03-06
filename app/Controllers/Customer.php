@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\WishlistModel;
 use App\Models\Authentication;
 use App\Libraries\ImplementJWT as GlobalImplementJWT;
 
@@ -67,6 +68,7 @@ class Customer extends BaseController
         $db = db_connect();
 
         $auth = new Authentication($db);
+        $wishlistModel = new WishlistModel($db);
 
         $post = json_decode($this->request->getBody());
         $post->password = $this->crypt($post->password, 'e');
@@ -74,7 +76,8 @@ class Customer extends BaseController
 
         if ($data) {
             $token = $this->objOfJwt->GenerateToken($data);
-            echo json_encode(['status' => true, 'auth_token' => $token, 'message' => 'Successful Login']);
+            $wishlists = $wishlistModel->getWishlistsByCustomerId($data->id);
+            echo json_encode(['status' => true, 'auth_token' => $token, "wishlist_count" => count($wishlists), 'message' => 'Successful Login']);
         } else {
             echo json_encode(['status' => false, 'message' => 'Unsuccessful Login']);
         }
