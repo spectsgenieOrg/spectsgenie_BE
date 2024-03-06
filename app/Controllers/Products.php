@@ -50,6 +50,20 @@ class Products extends BaseController
             . view('common/footer');
     }
 
+    public function contacts()
+    {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+        $products = $productModel->allContacts();
+
+        $data['products'] = $products;
+
+        return view('common/header')
+            . view('pages/all-contactlens', $data)
+            . view('common/footer');
+    }
+
     public function offline()
     {
         $db = db_connect();
@@ -91,6 +105,19 @@ class Products extends BaseController
             . view('common/footer');
     }
 
+    public function addcontactlens()
+    {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+
+
+        $data = array("brands" => $productModel->getBrands(), "genders" => $productModel->getGenders());
+        return view('common/header')
+            . view('pages/add-contactlens', $data)
+            . view('common/footer');
+    }
+
     public function edit($id)
     {
         $db = db_connect();
@@ -101,6 +128,18 @@ class Products extends BaseController
         $data = array("product" => $productModel->getProduct($id), "brands" => $productModel->getBrands(), "genders" => $productModel->getGenders(), "categories" => $productModel->getCategories(), "parents" => $productModel->getParentProducts(), "lensTypes" => $lensTypeModel->allLensTypes());
         return view('common/header')
             . view('pages/edit-product', $data)
+            . view('common/footer');
+    }
+
+    public function editcontactlens($id)
+    {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+
+        $data = array("product" => $productModel->getContactLensById($id), "brands" => $productModel->getBrands(), "genders" => $productModel->getGenders());
+        return view('common/header')
+            . view('pages/edit-contactlens', $data)
             . view('common/footer');
     }
 
@@ -170,6 +209,46 @@ class Products extends BaseController
         echo json_encode($response);
     }
 
+    public function addcontacts()
+    {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+        $images = "";
+        $gender = "";
+        $post = $this->request->getVar();
+        foreach ($post['sg_gender_ids'] as $gen) {
+            $gender .= $gen . ",";
+        }
+
+        $gender = rtrim($gender, ',');
+
+        if ($this->request->getFileMultiple('images')) {
+            $files = $this->request->getFileMultiple('images');
+
+            foreach ($files as $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $newName = $file->getRandomName();
+                    $images .= 'uploads/' . $newName . ',';
+                    $file->move(ROOTPATH . 'public/uploads', $newName);
+                }
+            }
+        }
+
+        $imgList = rtrim($images, ',');
+
+        $post['images'] = $imgList;
+        $post['sg_gender_ids'] = $gender;
+
+        $post = json_decode(json_encode($post));
+
+        $isSaved = $productModel->addContactLens($post);
+
+        $response = array("status" => $isSaved, "message" => $isSaved ? "Product added successfully" : "Error occurred while adding");
+
+        echo json_encode($response);
+    }
+
     public function update($id)
     {
         $db = db_connect();
@@ -224,6 +303,55 @@ class Products extends BaseController
 
         echo json_encode($response);
     }
+
+    public function updatecontactlens($id)
+    {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+
+        $images = "";
+        $gender = "";
+        $areImagesSet = false;
+        $post = $this->request->getVar();
+        foreach ($post['sg_gender_ids'] as $gen) {
+            $gender .= $gen . ",";
+        }
+
+        $gender = rtrim($gender, ',');
+
+
+        if ($this->request->getFileMultiple('images')) {
+            $files = $this->request->getFileMultiple('images');
+
+            foreach ($files as $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $newName = $file->getRandomName();
+                    $images .= 'uploads/' . $newName . ',';
+                    $file->move(ROOTPATH . 'public/uploads', $newName);
+                    $areImagesSet = true;
+                }
+            }
+        }
+
+        if ($areImagesSet) {
+            $imgList = rtrim($images, ',');
+
+            $post['images'] = $imgList;
+        }
+
+
+        $post['sg_gender_ids'] = $gender;
+
+        $post = json_decode(json_encode($post));
+
+        $isSaved = $productModel->updateContactLens($post, $id);
+
+        $response = array("status" => $isSaved, "message" => $isSaved ? "Product updated successfully" : "Error occurred while updating");
+
+        echo json_encode($response);
+    }
+
 
     public function getProductByCategory($category, $gender)
     {

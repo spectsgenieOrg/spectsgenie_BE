@@ -18,9 +18,19 @@ class ProductModel extends Model
         return $this->db->table('sg_product')->select('*')->orderBy('pr_id', 'DESC')->getWhere(['br_id' => session()->get('user_id'), 'platform' => $platform])->getResult();
     }
 
+    public function allContacts()
+    {
+        return $this->db->table('sg_contactlens')->select('*')->orderBy('id', 'DESC')->getWhere(['br_id' => session()->get('user_id')])->getResult();
+    }
+
     public function addProduct($data)
     {
         return $this->db->table('sg_product')->insert($data) ? true : false;
+    }
+
+    public function addContactLens($data)
+    {
+        return $this->db->table('sg_contactlens')->insert($data) ? true : false;
     }
 
     public function addParentProduct($data)
@@ -41,6 +51,11 @@ class ProductModel extends Model
     public function getProduct($productId)
     {
         return $this->db->table('sg_product')->select('*')->where('pr_id', $productId)->get()->getRow();
+    }
+
+    public function getContactLensById($productId)
+    {
+        return $this->db->table('sg_contactlens')->select('*')->where('id', $productId)->get()->getRow();
     }
 
     public function getProductsByParentId($parentId)
@@ -76,6 +91,11 @@ class ProductModel extends Model
     public function updateProduct($data, $id)
     {
         return $this->db->table('sg_product')->where('pr_id', $id)->update($data) ? true : false;
+    }
+
+    public function updateContactLens($data, $id)
+    {
+        return $this->db->table('sg_contactlens')->where('id', $id)->update($data) ? true : false;
     }
 
     public function getGroupedParentProduct($categoryId, $genderId)

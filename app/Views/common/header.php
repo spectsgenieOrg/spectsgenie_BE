@@ -242,6 +242,12 @@ $roles = [];
                                         </a>
                                     </li>
                                     <li class="nav-item">
+                                        <a href="/products/addcontactlens" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Add a contact lens</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a href="/products/addparent" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Add parent product</p>
@@ -258,6 +264,13 @@ $roles = [];
                                         <a href="/products/offline" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>View offline products</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="/products/contacts" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>View contact lenses</p>
                                         </a>
                                     </li>
                                 </ul>
