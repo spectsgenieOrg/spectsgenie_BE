@@ -47,7 +47,7 @@ class Authentication extends Model
 
     public function customerlogin($email, $password)
     {
-        return $this->db->table('sg_customer_online')->select('id, email, mobile')->getWhere(["email" => $email, "password" => $password])->getRow();
+        return $this->db->table('sg_customer_online')->select('id, email, name, mobile')->getWhere(["email" => $email, "password" => $password])->getRow();
     }
 
     public function updateProfile($data, $id)
