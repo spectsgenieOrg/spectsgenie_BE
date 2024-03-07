@@ -325,6 +325,73 @@ $roles = [];
                             </li>
 
                             <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-pager"></i>
+                                    <p>
+                                        Static pages
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/pages/privacy" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Privacy Policy</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="/pages/shipping" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Shipping Policy</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="/pages/refund" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Refund Policy</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="/pages/disclaimer" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Disclaimer</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="/pages/legal" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Legal Policy</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="/pages/terms" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Terms & Conditions</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="/pages/ipd" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>How to measure IPD?</p>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a href="/pages/contactlensusage" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Contact Lens Usage</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item">
                                 <a href="/logout" class="nav-link cursor">
                                     <i class="nav-icon fas fa-sign-out-alt"></i>
                                     <p>

@@ -20,4 +20,9 @@ $routes->group('wishlist', static function ($routes) {
     $routes->delete('(:num)', 'Wishlist::delete/$1');
 });
 
+$routes->group('pages', static function ($routes) {
+    $routes->get('(:alpha)', 'Pages::getpage/$1');
+    $routes->get('content/(:alpha)', 'Pages::content/$1');
+});
+
 //$routes->post('/lenstype/update/(:num)', 'Products::update/$1');
