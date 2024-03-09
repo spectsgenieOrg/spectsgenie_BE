@@ -249,6 +249,36 @@ class Products extends BaseController
         echo json_encode($response);
     }
 
+    public function contactlens()
+    {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+        $products = $productModel->fetchAllContacts();
+
+        if ($products) {
+            foreach ($products as $product) {
+                if ($product->images !== "") {
+                    $images = explode(",", $product->images);
+                    $i = 0;
+                    foreach ($images as $image) {
+                        $images[$i] = $this->baseURL . $image;
+                        $i++;
+                    }
+
+                    $product->images = $images;
+                } else {
+                    $product->images = [];
+                }
+            }
+            $response = array("status" => true, "message" => "Contact lens list", "data" => $products);
+        } else {
+            $response = array("status" => false, "message" => "Contact lens not available");
+        }
+
+        echo json_encode($response);
+    }
+
     public function update($id)
     {
         $db = db_connect();
@@ -511,15 +541,15 @@ class Products extends BaseController
         echo json_encode($response);
     }
 
-    public function addfromexcel()
-    {
-        $file = $this->request->getFile('productsSheet');
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getTempName());
+    // public function addfromexcel()
+    // {
+    //     $file = $this->request->getFile('productsSheet');
+    //     $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getTempName());
 
-        $dataFromActiveSheet = $spreadsheet->getActiveSheet()->toArray();
+    //     $dataFromActiveSheet = $spreadsheet->getActiveSheet()->toArray();
 
-        foreach ($dataFromActiveSheet as $row) {
-            var_dump($row);
-        }
-    }
+    //     foreach ($dataFromActiveSheet as $row) {
+    //         var_dump($row);
+    //     }
+    // }
 }

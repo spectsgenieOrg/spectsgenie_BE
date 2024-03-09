@@ -23,6 +23,11 @@ class ProductModel extends Model
         return $this->db->table('sg_contactlens')->select('*')->orderBy('id', 'DESC')->getWhere(['br_id' => session()->get('user_id')])->getResult();
     }
 
+    public function fetchAllContacts()
+    {
+        return $this->db->table('sg_contactlens')->select('*')->orderBy('id', 'DESC')->get()->getResult();
+    }
+
     public function addProduct($data)
     {
         return $this->db->table('sg_product')->insert($data) ? true : false;

@@ -43,6 +43,11 @@
                                 <label for="inputDescription">Product Description</label>
                                 <textarea id="inputDescription" class="form-control" name="description" rows="4"></textarea>
                             </div>
+
+                            <div class="form-group">
+                                <label for="inputSku">Quantity per box</label>
+                                <input type="number" id="inputquantitybox" name="quantity_per_box" class="form-control">
+                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -206,6 +211,7 @@
             description: "required",
             sku: "required",
             quantity: "required",
+            auantity_per_box: "required",
             price: "required",
             sale_price: "required",
             brand_id: "required",

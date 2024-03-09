@@ -43,6 +43,10 @@
                                 <label for="inputDescription">Product Description</label>
                                 <textarea id="inputDescription" class="form-control" name="description" rows="4"><?php echo $product->description; ?></textarea>
                             </div>
+                            <div class="form-group">
+                                <label for="inputSku">Quantity per box</label>
+                                <input type="number" id="inputquantitybox" name="quantity_per_box" value="<?php echo $product->quantity_per_box; ?>" class="form-control">
+                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -213,6 +217,7 @@
             description: "required",
             sku: "required",
             quantity: "required",
+            quantity_per_box: "required",
             price: "required",
             sale_price: "required",
             brand_id: "required",
