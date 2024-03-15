@@ -108,6 +108,11 @@ class ProductModel extends Model
         return $this->db->table('sg_product as sp')->join('sg_parent_product as pp', 'sp.parent_product_id = pp.id')->select('pp.id as parent_product_id, pp.name as parent_product_name')->where('sp.ca_id', $categoryId)->like('sp.sg_gender_ids', '%' . $genderId . '%')->groupBy('pp.id, pp.name')->get()->getResult();
     }
 
+    public function getGroupedParentProductInSameCategory($categoryId, $genderId, $parentId)
+    {
+        return $this->db->table('sg_product as sp')->join('sg_parent_product as pp', 'sp.parent_product_id = pp.id')->select('pp.id as parent_product_id, pp.name as parent_product_name')->where(['sp.ca_id' => $categoryId, 'pp.id <>' => $parentId])->like('sp.sg_gender_ids', '%' . $genderId . '%')->groupBy('pp.id, pp.name')->get()->getResult();
+    }
+
     public function getProductByCategoryGenderParent($categoryId, $genderId, $parentId)
     {
         return $this->db->table('sg_product as sp')->select('sp.*')->like('sp.sg_gender_ids', '%' . $genderId . '%')->getWhere(['sp.ca_id' => $categoryId, 'sp.parent_product_id' => $parentId])->getResult();

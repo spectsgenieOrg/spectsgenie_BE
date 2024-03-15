@@ -536,7 +536,37 @@ class Products extends BaseController
             }
         }
 
-        $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => array_values($productsBySameParent), "similar_products_count" => count($productsBySameParent));
+        $parentProductsInSameCategory = $productModel->getGroupedParentProductInSameCategory($currentProduct->ca_id, $currentProduct->sg_gender_ids, $parentProduct->id);
+
+        foreach ($parentProductsInSameCategory as $parent) {
+            $parent->products = $productModel->getProductByCategoryGenderParent($currentProduct->ca_id, $currentProduct->sg_gender_ids, $parent->parent_product_id);
+
+            foreach ($parent->products as $product) {
+                if ($product->pr_image !== "") {
+                    $images = explode(",", $product->pr_image);
+                    $i = 0;
+                    foreach ($images as $image) {
+                        $images[$i] = $this->baseURL . $image;
+                        $i++;
+                    }
+
+                    $product->pr_image = $images;
+                } else {
+                    $product->pr_image = [];
+                }
+
+                $product->is_wishlisted = false;
+
+                if (count($customerWishlists) > 0) {
+                    if (in_array($product->pr_id, $flattenedWishlistArray)) {
+                        $product->is_wishlisted = true;
+                    }
+                }
+            }
+        }
+
+
+        $response = array("status" => true, "message" => "Product Details", "current_product" => $currentProduct, "similar_products" => array_values($productsBySameParent), "similar_products_count" => count($productsBySameParent), "recommended_products" => $parentProductsInSameCategory);
 
         echo json_encode($response);
     }
