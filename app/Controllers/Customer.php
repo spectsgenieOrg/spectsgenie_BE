@@ -6,6 +6,7 @@ use App\Models\WishlistModel;
 use App\Models\Authentication;
 use App\Libraries\ImplementJWT as GlobalImplementJWT;
 use App\Models\CartModel;
+use App\Models\ReferralModel;
 
 class Customer extends BaseController
 {
@@ -49,16 +50,54 @@ class Customer extends BaseController
         $db = db_connect();
 
         $auth = new Authentication($db);
+        $referralModel = new ReferralModel($db);
 
         $post = json_decode($this->request->getBody());
 
         if ($auth->checkIfCustomerAlreadyExist($post->email)) {
             $response = array("status" => false, "message" => "Customer already exists");
         } else {
+            $referralCode = $post->referral_code;
+            unset($post->referral_code);
+            $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $post->referral_code = "SG-" . substr(str_shuffle($permitted_chars), 0, 8); // This is going to be assigned to the new user
             $post->password = $this->crypt($post->password, 'e');
             $isRegistered = $auth->registercustomer($post);
 
-            $response = array("status" => $isRegistered, "message" => $isRegistered ? "Customer added successfully" : "Error occurred while signing up, please retry");
+
+            // If no referral code, then make points as 0
+            if ($referralCode === "") {
+                $referralData = (object) array("referral_code" => $post->referral_code, "total_points" => 0);
+                $referralModel->addReferralRecord($referralData);
+
+                $response = array("status" => $isRegistered, "message" => $isRegistered ? "Customer added successfully" : "Error occurred while signing up, please retry", "is_referred" => false);
+            }
+
+            if ($referralCode !== "") {
+                if ($referralModel->checkIfReferralCodeExists($referralCode)) {
+                    //add new user's referral points
+                    $referralData = (object) array("referral_code" => $post->referral_code, "total_points" => 250);
+                    $referralModel->addReferralRecord($referralData);
+
+                    //Update the referrer's user points
+                    $referrerUser = $referralModel->getReferralDetailByCode($referralCode);
+                    $totalPoints = (int) $referrerUser->total_points + 250;
+
+                    $existingUserUpdatedReferralData = (object) array("total_points" => $totalPoints);
+                    $referralModel->updateReferralData($existingUserUpdatedReferralData, $referralCode);
+
+                    //Adding transactions of referral just to keep in our records
+                    $referralTransactionData = (object) array("referred_by" => $referralCode, "referred_to" => $post->referral_code);
+                    $referralModel->addReferralTransactionRecord($referralTransactionData);
+
+                    $response = array("status" => $isRegistered, "message" => $isRegistered ? "Customer added successfully" : "Error occurred while signing up, please retry", "is_referred" => true);
+                } else {
+                    // In case of invalid referral code
+                    $referralData = (object) array("referral_code" => $post->referral_code, "total_points" => 0);
+                    $referralModel->addReferralRecord($referralData);
+                    $response = array("status" => $isRegistered, "message" => $isRegistered ? "Customer added successfully, but the provided referral code was invalid" : "Error occurred while signing up, please retry", "is_referred" => false);
+                }
+            }
         }
 
         echo json_encode($response);
