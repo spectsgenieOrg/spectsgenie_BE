@@ -5,6 +5,7 @@
 <script src="<?php echo base_url(); ?>assets/js/additional-methods.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/plugins/select2/js/select2.full.min.js"></script>
 <?php $session = session();
+$baseURL = 'https://newpos.spectsgenie.com/';
 ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -56,7 +57,7 @@
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="inputImages">Product Images</label>
+                                <label for="inputImages">Product Images</label> <button type="button" data-toggle="modal" data-target="#imageModal" class="btn btn-link float-right">View All Images</button>
                                 <input type="file" multiple id="inputImages" name="images[]" class="form-control">
                             </div>
                             <div class="form-group">
@@ -121,7 +122,21 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4">
+
+                <div class="col-md-3">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputPSD">Upload PSD files</label>
+                                <input type="file" multiple id="inputPSD" name="psd_files[]" class="form-control">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -135,7 +150,7 @@
 
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -149,7 +164,7 @@
 
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -245,6 +260,46 @@
                 <div class="col-12">
                     <a href="#" class="btn btn-secondary">Cancel</a>
                     <input type="submit" value="Update product" class="btn btn-success float-right">
+                </div>
+            </div>
+
+            <div id="imageModal" class="modal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Select an image that will be shown on the product listing page</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <div class="container">
+
+                                    <?php $images = explode(',', $product->pr_image);
+                                    $i = 0; ?>
+                                    <?php foreach ($images as $image) {  ?>
+
+                                        <div style="display:flex;padding-left: 20px; align-items: center;">
+                                            <input class="form-check-input" type="radio" name="selected_image_to_show" value="<?php echo $i; ?>" <?php if ($product->selected_image_to_show == $i) {
+                                                                                                                                                        echo "checked";
+                                                                                                                                                    } ?>>
+                                            <div>
+                                                <img src="<?php echo $baseURL . '' . $image; ?>" style="width:150px;" />
+                                            </div>
+                                        </div>
+
+                                    <?php $i++;
+                                    } ?>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>

@@ -56,7 +56,7 @@
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="inputImages">Product Images</label>
+                                <label for="inputImages">Product Images</label> <button type="button" data-toggle="modal" data-target="#imageModal" class="btn btn-link float-right">View All Images</button>
                                 <input type="file" multiple id="inputImages" name="images[]" class="form-control">
                             </div>
                             <div class="form-group">
@@ -119,7 +119,18 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputPSD">Upload PSD files</label>
+                                <input type="file" multiple id="inputPSD" name="psd_files[]" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -132,7 +143,7 @@
                     <!-- /.card -->
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -145,7 +156,7 @@
                     <!-- /.card -->
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -239,6 +250,31 @@
                     <input type="submit" value="Create new Product" class="btn btn-success float-right">
                 </div>
             </div>
+
+            <div id="imageModal" class="modal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Select an image that will be shown on the product listing page</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+
+                            <div>
+                                <div id="selectedImageList" class="container">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
     </section>
 </div>
@@ -254,6 +290,26 @@
     }
 
     $('.select2').select2();
+
+    $('#inputImages').change(function() {
+        if (this.files) {
+            let fileList = this.files;
+            for (let i = 0; i < fileList.length; i++) {
+                let reader = new FileReader();
+                let imageRadioDiv = '';
+
+                reader.onload = function(e) {
+                    imageRadioDiv += '<div style="display:flex;padding-left: 20px; align-items: center;">';
+                    imageRadioDiv += '<input class="form-check-input" type="radio" name="selected_image_to_show" value="' + i + '"><div>'
+                    imageRadioDiv += '<img src="' + e.target.result + '" style="width:150px;" /></div></div>';
+                    $('#selectedImageList').append(imageRadioDiv);
+                }
+
+                reader.readAsDataURL(fileList[i]);
+            }
+
+        }
+    });
 
     $("#addProductForm").submit(function(event) {
         event.preventDefault();

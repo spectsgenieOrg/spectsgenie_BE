@@ -169,6 +169,8 @@ class Products extends BaseController
         $images = "";
         $gender = "";
         $lensTypeIds = "";
+        $psdFiles = "";
+        $arePSDfilesSet = false;
         $post = $this->request->getVar();
         foreach ($post['sg_gender_ids'] as $gen) {
             $gender .= $gen . ",";
@@ -194,7 +196,26 @@ class Products extends BaseController
             }
         }
 
+        if ($this->request->getFileMultiple('psd_files')) {
+            $files = $this->request->getFileMultiple('psd_files');
+
+            foreach ($files as $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $newName = $file->getRandomName();
+                    $psdFiles .= 'uploads/' . $newName . ',';
+                    $file->move(ROOTPATH . 'public/uploads', $newName);
+                    $arePSDfilesSet = true;
+                }
+            }
+        }
+
         $imgList = rtrim($images, ',');
+
+        if ($arePSDfilesSet) {
+            $psdFilesList = rtrim($psdFiles, ',');
+
+            $post['psd_files'] = $psdFilesList;
+        }
 
         $post['pr_image'] = $imgList;
         $post['sg_gender_ids'] = $gender;
@@ -286,9 +307,11 @@ class Products extends BaseController
         $productModel = new ProductModel($db);
 
         $images = "";
+        $psdFiles = "";
         $gender = "";
         $lensTypeIds = "";
         $areImagesSet = false;
+        $arePSDfilesSet = false;
         $post = $this->request->getVar();
         foreach ($post['sg_gender_ids'] as $gen) {
             $gender .= $gen . ",";
@@ -315,10 +338,29 @@ class Products extends BaseController
             }
         }
 
+        if ($this->request->getFileMultiple('psd_files')) {
+            $files = $this->request->getFileMultiple('psd_files');
+
+            foreach ($files as $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $newName = $file->getRandomName();
+                    $psdFiles .= 'uploads/' . $newName . ',';
+                    $file->move(ROOTPATH . 'public/uploads', $newName);
+                    $arePSDfilesSet = true;
+                }
+            }
+        }
+
         if ($areImagesSet) {
             $imgList = rtrim($images, ',');
 
             $post['pr_image'] = $imgList;
+        }
+
+        if ($arePSDfilesSet) {
+            $psdFilesList = rtrim($psdFiles, ',');
+
+            $post['psd_files'] = $psdFilesList;
         }
 
 
