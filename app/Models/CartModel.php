@@ -32,4 +32,9 @@ class CartModel extends Model
     {
         return $this->db->table('sg_cart')->select('*')->where('customer_id', $customerId)->get()->getResult();
     }
+
+    public function removeCartItemsByCustomerID($customerId)
+    {
+        return $this->db->table('sg_cart')->where('customer_id', $customerId)->delete();
+    }
 }
