@@ -25,4 +25,9 @@ $routes->group('pages', static function ($routes) {
     $routes->get('content/(:alpha)', 'Pages::content/$1');
 });
 
+$routes->group('address', static function ($routes) {
+    $routes->post('add', 'Customer::addAddress');
+    $routes->get('getall', 'Customer::getAllAddress');
+});
+
 //$routes->post('/lenstype/update/(:num)', 'Products::update/$1');

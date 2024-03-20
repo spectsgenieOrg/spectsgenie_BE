@@ -54,4 +54,14 @@ class Authentication extends Model
     {
         return $this->db->table('sg_customer_online')->where('id', $id)->update($data) ? true : false;
     }
+
+    public function addCustomerAddress($data)
+    {
+        return $this->db->table('sg_customer_address')->insert($data) ? true : false;
+    }
+
+    public function fetchCustomerAddressess($customerId)
+    {
+        return $this->db->table('sg_customer_address')->select('*')->where('customer_id', $customerId)->get()->getResult();
+    }
 }

@@ -103,6 +103,60 @@ class Customer extends BaseController
         echo json_encode($response);
     }
 
+    public function addAddress()
+    {
+        $db = db_connect();
+
+        $auth = new Authentication($db);
+
+
+        if ($this->request->hasHeader('Authorization')) {
+            $token = $this->request->header('Authorization')->getValue();
+
+            $data = $this->objOfJwt->DecodeToken($token);
+
+            $post = json_decode($this->request->getBody());
+
+            $post->customer_id = $data['id'];
+
+            $isAddressSaved = $auth->addCustomerAddress($post);
+            if ($isAddressSaved) {
+                $response = array("status" => true, "message" => "Address added successfully", "data" => $post);
+            } else {
+                $response = array("status" => false, "message" => "Some error occurred while adding address, please try again");
+            }
+        } else {
+            $response = array("message" => "Unauthorized access", "status" => false);
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getAllAddress()
+    {
+        $db = db_connect();
+
+        $auth = new Authentication($db);
+
+
+        if ($this->request->hasHeader('Authorization')) {
+            $token = $this->request->header('Authorization')->getValue();
+
+            $data = $this->objOfJwt->DecodeToken($token);
+
+            $customerAddress = $auth->fetchCustomerAddressess($data['id']);
+            if ($customerAddress) {
+                $response = array("status" => true, "message" => "List of customer's addresses", "data" => $customerAddress);
+            } else {
+                $response = array("status" => false, "message" => "Some error occurred while fetching the addressess, please try again");
+            }
+        } else {
+            $response = array("message" => "Unauthorized access", "status" => false);
+        }
+
+        echo json_encode($response);
+    }
+
     public function login()
     {
         $db = db_connect();
@@ -112,7 +166,9 @@ class Customer extends BaseController
         $cart = new CartModel($db);
 
         $post = json_decode($this->request->getBody());
+
         $post->password = $this->crypt($post->password, 'e');
+
         $data = $auth->customerlogin($post->email, $post->password);
 
         if ($data) {
