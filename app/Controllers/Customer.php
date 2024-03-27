@@ -17,7 +17,7 @@ class Customer extends BaseController
         $this->objOfJwt = new GlobalImplementJWT();
         header('Content-Type: application/json');
         header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Headers: Authorization, Cache-Control, Content-Type');
+        header('Access-Control-Allow-Headers: Authorization, Content-Type');
         header('Access-Control-Allow-Methods: GET, HEAD, POST, OPTIONS, PUT, DELETE');
         $method = $_SERVER['REQUEST_METHOD'];
         if ($method == "OPTIONS") {
@@ -103,12 +103,11 @@ class Customer extends BaseController
         echo json_encode($response);
     }
 
-    public function addAddress()
+    public function address()
     {
         $db = db_connect();
 
         $auth = new Authentication($db);
-
 
         if ($this->request->hasHeader('Authorization')) {
             $token = $this->request->header('Authorization')->getValue();
@@ -229,5 +228,17 @@ class Customer extends BaseController
         }
 
         echo json_encode($response);
+    }
+
+    public function fetchfile()
+    {
+        $urlParam = $this->request->getUri()->getQuery();
+
+        $url = explode("%2F", explode("=", $urlParam)[1]);
+        $finalPath = FCPATH . $url[3] . "/". $url[4];
+        $type = pathinfo($finalPath, PATHINFO_EXTENSION);
+        $data = file_get_contents($finalPath);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        echo $base64;
     }
 }

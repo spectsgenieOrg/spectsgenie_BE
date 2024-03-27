@@ -26,7 +26,6 @@ $routes->group('pages', static function ($routes) {
 });
 
 $routes->group('address', static function ($routes) {
-    $routes->post('add', 'Customer::addAddress');
     $routes->get('getall', 'Customer::getAllAddress');
 });
 

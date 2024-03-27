@@ -510,6 +510,18 @@ class Products extends BaseController
             $currentProduct->pr_image = [];
         }
 
+        if ($currentProduct->psd_files !== "") {
+            $currentProductPSDFiles = explode(",", $currentProduct->psd_files);
+            $i = 0;
+            foreach ($currentProductPSDFiles as $psd) {
+                $currentProductPSDFiles[$i] = $this->baseURL . $psd;
+                $i++;
+            }
+            $currentProduct->psd_files = $currentProductPSDFiles;
+        } else {
+            $currentProduct->psd_files = [];
+        }
+
         $currentProduct->is_wishlisted = false;
 
         if (count($customerWishlists) > 0) {
