@@ -9,6 +9,7 @@ use App\Models\OrderModel;
 class Orders extends BaseController
 {
     protected $objOfJwt;
+    public $baseURL = 'https://newpos.spectsgenie.com/';
 
     public function __construct()
     {
@@ -63,6 +64,50 @@ class Orders extends BaseController
                 }
             } else {
                 $response = array("message" => "Order Failed", "status" => true);
+            }
+        } else {
+            $response = array("message" => "Unauthorized access", "status" => false);
+        }
+        echo json_encode($response);
+    }
+
+    public function fetch($customerId)
+    {
+        $db = db_connect();
+
+        $orderModel = new OrderModel($db);
+
+        if ($this->request->hasHeader('Authorization')) {
+
+            $orders = $orderModel->getOrdersByCustomerId($customerId);
+
+            if (count($orders) > 0) {
+                foreach ($orders as $key => $order) {
+                    $orderDetailIds = explode(",", $order['order_detail_id']);
+                    $itemDetailArr = [];
+                    foreach ($orderDetailIds as $orderDetailId) {
+                        $item_detail = $orderModel->getOrderDetailById($orderDetailId);
+                        if ($item_detail->product_images !== "") {
+                            $images = explode(",", $item_detail->product_images);
+                            $i = 0;
+
+                            foreach ($images as $image) {
+                                $images[$i] = $this->baseURL . $image;
+                                $i++;
+                            }
+
+                            $item_detail->product_images = $images;
+                        } else {
+                            $item_detail->product_images = [];
+                        }
+                        $itemDetailArr[] = $item_detail;
+                    }
+                    $orders[$key]['ordered_items'] = $itemDetailArr;
+                }
+
+                $response = array("message" => "List of orders", "status" => true, "data" => $orders);
+            } else {
+                $response = array("message" => "Orders not available", "status" => false);
             }
         } else {
             $response = array("message" => "Unauthorized access", "status" => false);
