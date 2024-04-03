@@ -79,38 +79,45 @@ class Orders extends BaseController
 
         if ($this->request->hasHeader('Authorization')) {
 
-            $orders = $orderModel->getOrdersByCustomerId($customerId);
+            $token = $this->request->header('Authorization')->getValue();
+            $data = $this->objOfJwt->DecodeToken($token);
 
-            if (count($orders) > 0) {
-                foreach ($orders as $key => $order) {
-                    $orderDetailIds = explode(",", $order['order_detail_id']);
-                    $itemDetailArr = [];
-                    foreach ($orderDetailIds as $orderDetailId) {
-                        $item_detail = $orderModel->getOrderDetailById($orderDetailId);
-                        if ($item_detail->product_images !== "") {
-                            $images = explode(",", $item_detail->product_images);
-                            $i = 0;
+            if ($data && $data['id'] && $data['id'] === $customerId) {
+                $orders = $orderModel->getOrdersByCustomerId($data['id']);
 
-                            foreach ($images as $image) {
-                                $images[$i] = $this->baseURL . $image;
-                                $i++;
+                if (count($orders) > 0) {
+                    foreach ($orders as $key => $order) {
+                        $orderDetailIds = explode(",", $order['order_detail_id']);
+                        $itemDetailArr = [];
+                        foreach ($orderDetailIds as $orderDetailId) {
+                            $item_detail = $orderModel->getOrderDetailById($orderDetailId);
+                            if ($item_detail->product_images !== "") {
+                                $images = explode(",", $item_detail->product_images);
+                                $i = 0;
+
+                                foreach ($images as $image) {
+                                    $images[$i] = $this->baseURL . $image;
+                                    $i++;
+                                }
+
+                                $item_detail->product_images = $images;
+                            } else {
+                                $item_detail->product_images = [];
                             }
-
-                            $item_detail->product_images = $images;
-                        } else {
-                            $item_detail->product_images = [];
+                            $itemDetailArr[] = $item_detail;
                         }
-                        $itemDetailArr[] = $item_detail;
+                        $orders[$key]['ordered_items'] = $itemDetailArr;
                     }
-                    $orders[$key]['ordered_items'] = $itemDetailArr;
-                }
 
-                $response = array("message" => "List of orders", "status" => true, "data" => $orders);
+                    $response = array("message" => "List of orders", "status" => true, "data" => $orders);
+                } else {
+                    $response = array("message" => "Orders not available", "status" => false);
+                }
             } else {
-                $response = array("message" => "Orders not available", "status" => false);
+                $response = array("message" => "Unauthorized access", "status" => false);
             }
         } else {
-            $response = array("message" => "Unauthorized access", "status" => false);
+            $response = array("message" => "Token not available", "status" => false);
         }
         echo json_encode($response);
     }

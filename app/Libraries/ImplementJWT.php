@@ -17,8 +17,14 @@ class ImplementJWT
 
     public function DecodeToken($token)
     {
-        $decodedTokenData = JWT::decode($token, new Key($this->key, 'HS256'));
-        $decodedData = (array) $decodedTokenData;
-        return $decodedData;
+        $regex = '~(^[\w-]+\.[\w-]+\.[\w-]+$)~';
+        if (preg_match($regex, $token)) {
+            $decodedTokenData = JWT::decode($token, new Key($this->key, 'HS256'));
+            $decodedData = (array) $decodedTokenData;
+            return $decodedData;
+        }
+        else {
+            return false;
+        }
     }
 }
