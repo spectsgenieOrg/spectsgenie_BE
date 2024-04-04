@@ -40,6 +40,9 @@ class Pages extends BaseController
         } else if ($pagetype === "contactlensusage") {
             $meta->{'title'} = "Contact Lenses Usage";
             $meta->{'type'} = 'contactlensusage';
+        } else if ($pagetype === "chooserightmaterialforeyewear") {
+            $meta->{'title'} = "How to choose right material for eyewear?";
+            $meta->{'type'} = 'chooserightmaterialforeyewear';
         }
 
         $pagecontent = $pageModel->getPageContentByType($meta->{'type'});

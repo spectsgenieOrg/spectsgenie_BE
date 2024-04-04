@@ -185,6 +185,7 @@ class Customer extends BaseController
         $db = db_connect();
 
         $auth = new Authentication($db);
+        $referralModel = new ReferralModel($db);
 
         if ($this->request->hasHeader('Authorization')) {
             $token = $this->request->header('Authorization')->getValue();
@@ -193,6 +194,10 @@ class Customer extends BaseController
             $profile = $auth->getCustomerById($data['id']);
 
             if ($profile) {
+                if ($referralModel->checkIfReferralCodeExists($profile->referral_code)) {
+                    $referrerUser = $referralModel->getReferralDetailByCode($profile->referral_code);
+                    $profile->{'referral_points'} = $referrerUser->total_points;
+                }
                 $response = array("status" => true, "message" => "Customer details", "data" => $profile);
             } else {
                 $response = array("status" => false, "message" => "Customer doesn't exist");
@@ -235,7 +240,7 @@ class Customer extends BaseController
         $urlParam = $this->request->getUri()->getQuery();
 
         $url = explode("%2F", explode("=", $urlParam)[1]);
-        $finalPath = FCPATH . $url[3] . "/". $url[4];
+        $finalPath = FCPATH . $url[3] . "/" . $url[4];
         $type = pathinfo($finalPath, PATHINFO_EXTENSION);
         $data = file_get_contents($finalPath);
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);

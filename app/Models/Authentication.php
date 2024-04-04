@@ -42,7 +42,7 @@ class Authentication extends Model
 
     public function getCustomerById($id)
     {
-        return $this->db->table('sg_customer_online')->select('name, email, mobile')->where('id', $id)->get()->getRow();
+        return $this->db->table('sg_customer_online')->select('id, name, email, mobile, referral_code')->where('id', $id)->get()->getRow();
     }
 
     public function customerlogin($email, $password)
