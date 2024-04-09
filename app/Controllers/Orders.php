@@ -3,13 +3,16 @@
 namespace App\Controllers;
 
 use App\Libraries\ImplementJWT as GlobalImplementJWT;
+use App\Models\Authentication;
 use App\Models\CartModel;
 use App\Models\OrderModel;
+use App\Models\ProductModel;
 
 class Orders extends BaseController
 {
     protected $objOfJwt;
     public $baseURL = 'https://newpos.spectsgenie.com/';
+
 
     public function __construct()
     {
@@ -30,6 +33,12 @@ class Orders extends BaseController
 
         $orders = new OrderModel($db);
         $cart = new CartModel($db);
+        $auth = new Authentication($db);
+        $product = new ProductModel($db);
+
+        $curlRequest = \Config\Services::curlrequest([
+            'baseURI' => 'https://apiv2.shiprocket.in/v1/external/',
+        ]);
 
         if ($this->request->hasHeader('Authorization')) {
             $token = $this->request->header('Authorization')->getValue();
@@ -42,9 +51,18 @@ class Orders extends BaseController
             $idx = 0;
             $areAllItemsSaved = false;
 
+            $orderItems = [];
+
+
             foreach ($post->items as $item) {
                 $item->order_id = $orderId;
                 $orders->addOrderDetail($item);
+
+                $itemDetail = $product->getProduct($item->product_id);
+                $orderedItems = (object) array('name' => $itemDetail->pr_name, 'sku' => $itemDetail->pr_sku, 'selling_price' =>  $itemDetail->pr_sprice, 'units' => 1);
+
+                $orderItems[] = $orderedItems;
+
                 $idx++;
 
                 if ($idx === count($post->items)) {
@@ -54,6 +72,46 @@ class Orders extends BaseController
 
             if ($areAllItemsSaved) {
                 $orderData = (object) array("customer_id" => $data['id'], "order_id" => $orderId, "address_id" => $post->address_id, "discount" => $post->discount, "discount_code" => $post->discount_code, "actual_total_amount" => $post->total_amount, "total_amount" => (int) $post->total_amount - (int) $post->discount, "order_status" => "pending");
+
+                $customerAddress = $auth->getCustomerAddressByAddressId($post->address_id);
+
+                //Shiprocket data
+                $shipRocketOrderData = array(
+                    "order_id" => $orderId,
+                    "order_date" => date('yy-m-d'),
+                    "pickup_location" => "Primary",
+                    "billing_customer_name" => $data['name'],
+                    "billing_last_name" => "",
+                    "billing_city" => $customerAddress->city,
+                    "billing_pincode" => $customerAddress->pincode,
+                    "billing_state" => $customerAddress->state,
+                    "billing_country" => $customerAddress->country,
+                    "billing_email" => $data['email'],
+                    "billing_phone" => $data['mobile'],
+                    "billing_address" => $customerAddress->address_line_1 . ', ' . $customerAddress->address_line_2,
+                    "shipping_is_billing" => true,
+                    "order_items" => $orderItems,
+                    "payment_method" => "COD",
+                    "sub_total" => (int) $post->total_amount - (int) $post->discount,
+                    "length" => 10.0,
+                    "breadth" => 10.0,
+                    "height" => 10.0,
+                    "weight" => 0.25,
+                );
+
+                $shipRocketLoginRequest = $curlRequest->request('POST', 'auth/login', ['json' => ['email' => 'sajal.suraj@gmail.com', 'password' => 'S.S.suraj123']]);
+                $shipRocketLoginResponse = json_decode($shipRocketLoginRequest->getBody());
+
+
+                $shipRocketCreateOrder = $curlRequest->request('POST', 'orders/create/adhoc', ['json' => $shipRocketOrderData, 'headers' => ['Authorization' => 'Bearer ' . $shipRocketLoginResponse->token . '', 'Content-Type' => 'application/json']]);
+                $shipRocketOrderResponse = json_decode($shipRocketCreateOrder->getBody());
+
+
+
+                $shipRocketOrderResponseArray = json_decode(json_encode($shipRocketOrderResponse), true);
+                $shipRocketOrderDataResponse = array(...$shipRocketOrderResponseArray);
+                $orders->addShipRocketOrderDetail($shipRocketOrderDataResponse);
+
 
                 $isOrderCreated = $orders->addOrder($orderData);
                 if ($isOrderCreated) {
