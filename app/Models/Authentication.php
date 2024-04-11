@@ -40,6 +40,11 @@ class Authentication extends Model
         return $this->db->table('sg_customer_online')->select('*')->where('email', $email)->get()->getNumRows() > 0 ? true : false;
     }
 
+    public function checkIfCustomerAlreadyExistWithGoogleId($email, $googleId)
+    {
+        return $this->db->table('sg_customer_online')->select('*')->getWhere(["email" => $email, "google_profile_id" => $googleId])->getNumRows() > 0 ? true : false;
+    }
+
     public function getCustomerById($id)
     {
         return $this->db->table('sg_customer_online')->select('id, name, email, mobile, referral_code')->where('id', $id)->get()->getRow();
@@ -49,6 +54,12 @@ class Authentication extends Model
     {
         return $this->db->table('sg_customer_online')->select('id, email, name, mobile')->getWhere(["email" => $email, "password" => $password])->getRow();
     }
+
+    public function customerLoginWithGoogleId($email, $googleId)
+    {
+        return $this->db->table('sg_customer_online')->select('id, email, name, mobile')->getWhere(["email" => $email, "google_profile_id" => $googleId])->getRow();
+    }
+
 
     public function updateProfile($data, $id)
     {

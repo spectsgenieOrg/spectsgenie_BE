@@ -45,6 +45,61 @@ class Customer extends BaseController
         return $output;
     }
 
+
+    public function googleauth()
+    {
+        $db = db_connect();
+
+        $auth = new Authentication($db);
+        $referralModel = new ReferralModel($db);
+
+        $post = json_decode($this->request->getBody());
+
+        if ($auth->checkIfCustomerAlreadyExist($post->email)) {
+            if ($auth->checkIfCustomerAlreadyExistWithGoogleId($post->email, $post->google_profile_id)) {
+                // Login
+                $wishlistModel = new WishlistModel($db);
+                $cart = new CartModel($db);
+
+                $data = $auth->customerLoginWithGoogleId($post->email, $post->google_profile_id);
+
+                $token = $this->objOfJwt->GenerateToken($data);
+                $wishlists = $wishlistModel->getWishlistsByCustomerId($data->id);
+                $itemsInCart = $cart->getCartByCustomerID($data->id);
+
+                $response = array('status' => true, 'auth_token' => $token, "wishlist_count" => count($wishlists), "cart_items_count" => count($itemsInCart), "customer_data" => $data, 'message' => 'Signed in successfully');
+            } else {
+                $response = array('status' => false, 'message' => "User is already registered but didn't signup with google, please try to login with email and password");
+            }
+        } else {
+            $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $post->referral_code = "SG-" . substr(str_shuffle($permitted_chars), 0, 8); // This is going to be assigned to the new user
+
+            $isRegistered = $auth->registercustomer($post);
+
+            $referralData = (object) array("referral_code" => $post->referral_code, "total_points" => 0);
+            $referralModel->addReferralRecord($referralData);
+
+            // If registered, then login
+            if ($isRegistered) {
+                $wishlistModel = new WishlistModel($db);
+                $cart = new CartModel($db);
+
+                $data = $auth->customerLoginWithGoogleId($post->email, $post->google_profile_id);
+
+                $token = $this->objOfJwt->GenerateToken($data);
+                $wishlists = $wishlistModel->getWishlistsByCustomerId($data->id);
+                $itemsInCart = $cart->getCartByCustomerID($data->id);
+
+                $response = array('status' => true, 'auth_token' => $token, "wishlist_count" => count($wishlists), "cart_items_count" => count($itemsInCart), "customer_data" => $data, 'message' => 'Signed in successfully');
+            } else {
+                $response = array("status" => false, "message" => "Error occurred while signing up, please retry");
+            }
+        }
+
+        echo json_encode($response);
+    }
+
     public function signup()
     {
         $db = db_connect();
