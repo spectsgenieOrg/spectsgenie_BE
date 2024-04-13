@@ -32,6 +32,8 @@ class Cart extends BaseController
         $db = db_connect();
 
         $cart = new CartModel($db);
+        $productModel = new ProductModel($db);
+        $lensPackageModel = new LenspackageModel($db);
 
         if ($this->request->hasHeader('Authorization')) {
             $token = $this->request->header('Authorization')->getValue();
@@ -45,6 +47,13 @@ class Cart extends BaseController
             if ($isItemAddedInCart !== NULL) {
                 $response = array("message" => "Item already present in the cart, try adding another product", "status" => false);
             } else {
+                $totalTax = 0;
+                $item = $productModel->getProduct($post->product_id);
+                $lensPackage = $lensPackageModel->getLensPackageById($post->lens_package_id);
+                $totalTax = $item->ca_id !== "9" ? (float) $item->pr_sprice * 0.12 : (float) $item->pr_sprice * 0.18;
+
+                $totalTax = $totalTax + (float) $lensPackage->price * 0.12;
+                $post->price = (int) $post->price + (int) $totalTax;
                 $isSaved = $cart->addCart($post);
 
                 if ($isSaved) {

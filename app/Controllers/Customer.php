@@ -241,6 +241,8 @@ class Customer extends BaseController
 
         $auth = new Authentication($db);
         $referralModel = new ReferralModel($db);
+        $wishlistModel = new WishlistModel($db);
+        $cart = new CartModel($db);
 
         if ($this->request->hasHeader('Authorization')) {
             $token = $this->request->header('Authorization')->getValue();
@@ -249,10 +251,14 @@ class Customer extends BaseController
             $profile = $auth->getCustomerById($data['id']);
 
             if ($profile) {
+                $wishlists = $wishlistModel->getWishlistsByCustomerId($data['id']);
+                $itemsInCart = $cart->getCartByCustomerID($data['id']);
                 if ($referralModel->checkIfReferralCodeExists($profile->referral_code)) {
                     $referrerUser = $referralModel->getReferralDetailByCode($profile->referral_code);
                     $profile->{'referral_points'} = $referrerUser->total_points;
                 }
+                $profile->{`wishlist_count`} = count($wishlists);
+                $profile->{`cart_items_count`} = count($itemsInCart);
                 $response = array("status" => true, "message" => "Customer details", "data" => $profile);
             } else {
                 $response = array("status" => false, "message" => "Customer doesn't exist");
