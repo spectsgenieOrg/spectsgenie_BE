@@ -108,6 +108,9 @@ class Cart extends BaseController
 
                     $itemsList[$i]['lens_type'] = $lensTypeModel->getLensTypeById($item->lens_type_id);
                     $itemsList[$i]['lens_package'] = $lensPackageModel->getLensPackageById($item->lens_package_id);
+                    $totalTax = $itemsList[$i]['product'] !== "9" ? (float) $itemsList[$i]['product']->pr_sprice * 0.12 : (float) $itemsList[$i]['product']->pr_sprice * 0.18;
+                    $totalTax = $totalTax + (float) $itemsList[$i]['lens_package']->price * 0.12;
+                    $itemsList[$i]['gst'] = (int) $totalTax;
                     $itemsList[$i]['total_price'] = $item->price;
                     $i++;
                 }
