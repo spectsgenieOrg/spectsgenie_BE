@@ -52,9 +52,20 @@ class Orders extends BaseController
             $areAllItemsSaved = false;
 
             $orderItems = [];
+            $itemsList = [];
 
+            $itemsInCart = $cart->getCartByCustomerID($data['id']);
+            $totalAmount = 0;
+            $i = 0;
+            foreach ($itemsInCart as $item) {
+                $parentProduct = $product->getGroupedParentByProductID($item->product_id);
+                $itemProduct = $product->getProduct($item->product_id);
+                $itemsList[$i] = (object) array('product_id' => $item->product_id, 'parent_product_id' => $parentProduct->parent_product_id, 'lens_type_id' => $item->lens_type_id, 'category_id' => $itemProduct->ca_id, 'lens_package_id' => $item->lens_package_id, 'quantity' => "1");
+                $i++;
+                $totalAmount += $item->price;
+            }
 
-            foreach ($post->items as $item) {
+            foreach ($itemsList as $item) {
                 $item->order_id = $orderId;
                 $orders->addOrderDetail($item);
 
@@ -65,13 +76,13 @@ class Orders extends BaseController
 
                 $idx++;
 
-                if ($idx === count($post->items)) {
+                if ($idx === count($itemsList)) {
                     $areAllItemsSaved = true;
                 }
             }
 
             if ($areAllItemsSaved) {
-                $orderData = (object) array("customer_id" => $data['id'], "order_id" => $orderId, "address_id" => $post->address_id, "discount" => $post->discount, "discount_code" => $post->discount_code, "actual_total_amount" => $post->total_amount, "total_amount" => (int) $post->total_amount - (int) $post->discount, "order_status" => "pending");
+                $orderData = (object) array("customer_id" => $data['id'], "order_id" => $orderId, "address_id" => $post->address_id, "discount" => $post->discount, "discount_code" => $post->discount_code, "actual_total_amount" => $totalAmount, "total_amount" => (int) $totalAmount - (int) $post->discount, "order_status" => "pending");
 
                 $customerAddress = $auth->getCustomerAddressByAddressId($post->address_id);
 
@@ -92,7 +103,7 @@ class Orders extends BaseController
                     "shipping_is_billing" => true,
                     "order_items" => $orderItems,
                     "payment_method" => "COD",
-                    "sub_total" => (int) $post->total_amount - (int) $post->discount,
+                    "sub_total" => (int) $totalAmount - (int) $post->discount,
                     "length" => 10.0,
                     "breadth" => 10.0,
                     "height" => 10.0,
