@@ -127,7 +127,7 @@ class Orders extends BaseController
                 $isOrderCreated = $orders->addOrder($orderData);
                 if ($isOrderCreated) {
                     $cart->removeCartItemsByCustomerID($data['id']);
-                    $response = array("message" => "Order Successful", "status" => true);
+                    $response = array("message" => "Order Successful", "order_id" => $orderId, "status" => true);
                 } else {
                     $response = array("message" => "Some error occurred, please re-order", "status" => false);
                 }
