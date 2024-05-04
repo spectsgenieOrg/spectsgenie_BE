@@ -19,6 +19,11 @@ class OrderModel extends Model
         return $this->db->table('sg_orders_online')->insert($data) ? true : false;
     }
 
+    public function addOrderTransactionDetail($data)
+    {
+        return $this->db->table('sg_order_transactions')->insert($data) ? true : false;
+    }
+
     public function addOrderDetail($data)
     {
         return $this->db->table('sg_order_detail')->insert($data) ? true : false;

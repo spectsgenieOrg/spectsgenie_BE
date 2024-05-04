@@ -140,6 +140,28 @@ class Orders extends BaseController
         echo json_encode($response);
     }
 
+    public function addordertransactions()
+    {
+        $db = db_connect();
+
+        $orders = new OrderModel($db);
+
+        if ($this->request->hasHeader('Authorization')) {
+            $post = json_decode($this->request->getBody());
+
+            $isOrderTransactionCreated = $orders->addOrderTransactionDetail($post);
+
+            if ($isOrderTransactionCreated) {
+                $response = array("message" => "Successfully added to transactions", "status" => true);
+            } else {
+                $response = array("message" => "Some error occurred, please re-order", "status" => false);
+            }
+        } else {
+            $response = array("message" => "Unauthorized access", "status" => false);
+        }
+        echo json_encode($response);
+    }
+
     public function fetch($customerId)
     {
         $db = db_connect();
