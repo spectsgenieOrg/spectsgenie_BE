@@ -211,6 +211,32 @@ class Customer extends BaseController
         echo json_encode($response);
     }
 
+    public function updateaddress($addressId)
+    {
+        $db = db_connect();
+
+        $auth = new Authentication($db);
+
+        if ($this->request->hasHeader('Authorization')) {
+            $token = $this->request->header('Authorization')->getValue();
+            //$data = $this->objOfJwt->DecodeToken($token);
+
+            $post = json_decode($this->request->getBody());
+
+            $isSaved = $auth->updateAddress($post, $addressId);
+
+            if ($isSaved) {
+                $response = array("status" => true, "message" => "Address successfully updated", "data" => $post);
+            } else {
+                $response = array("status" => false, "message" => "Error occurred while updating address, please try again", "data" => []);
+            }
+        } else {
+            $response = array("message" => "Unauthorized access", "status" => false);
+        }
+
+        echo json_encode($response);
+    }
+
     public function login()
     {
         $db = db_connect();
