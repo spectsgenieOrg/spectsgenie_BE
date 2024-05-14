@@ -237,6 +237,28 @@ class Customer extends BaseController
         echo json_encode($response);
     }
 
+    public function fetchaddress($addressId)
+    {
+        $db = db_connect();
+
+        $auth = new Authentication($db);
+
+
+        if ($this->request->hasHeader('Authorization')) {
+            $token = $this->request->header('Authorization')->getValue();
+            $customerAddress = $auth->getCustomerAddressByAddressId($addressId);
+            if ($customerAddress) {
+                $response = array("status" => true, "message" => "Address detail", "data" => $customerAddress);
+            } else {
+                $response = array("status" => false, "message" => "Some error occurred while fetching the address, please try again");
+            }
+        } else {
+            $response = array("message" => "Unauthorized access", "status" => false);
+        }
+
+        echo json_encode($response);
+    }
+
     public function login()
     {
         $db = db_connect();
