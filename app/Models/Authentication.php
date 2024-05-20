@@ -50,6 +50,16 @@ class Authentication extends Model
         return $this->db->table('sg_customer_online')->select('id, name, email, mobile, referral_code')->where('id', $id)->get()->getRow();
     }
 
+    public function getCustomerByEmailId($emailId)
+    {
+        return $this->db->table('sg_customer_online')->select('id, email')->where('email', $emailId)->get()->getRow();
+    }
+
+    public function checkCustomerByEmailAndId($emailId, $id)
+    {
+        return $this->db->table('sg_customer_online')->select('*')->getWhere(["email" => $emailId, "id" => $id])->getNumRows() > 0 ? true : false;
+    }
+
     public function customerlogin($email, $password)
     {
         return $this->db->table('sg_customer_online')->select('id, email, name, mobile')->getWhere(["email" => $email, "password" => $password])->getRow();

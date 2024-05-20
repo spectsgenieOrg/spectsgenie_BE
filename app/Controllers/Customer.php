@@ -344,6 +344,70 @@ class Customer extends BaseController
         echo json_encode($response);
     }
 
+    public function forgotpassword()
+    {
+        $db = db_connect();
+        $auth = new Authentication($db);
+        $post = json_decode($this->request->getBody());
+
+        if ($auth->checkIfCustomerAlreadyExist($post->email)) {
+            $customerData = $auth->getCustomerByEmailId($post->email);
+            $token = $this->objOfJwt->GenerateToken($customerData);
+
+            $msg = "Greetings from SpectsGenie. Please change your account's password after clicking on this Link - https://spectsgenie.com/change-password?reset_token=" . $token;
+
+            $headers = "From: noreply@spectsgenie.com" . "\r\n" .
+                'X-Mailer: PHP/' . phpversion();
+            // send email
+
+            $mail = mail($post->email, "Reset Password - SpectsGenie", $msg, $headers);
+
+            if (!$mail) {
+                $response = array(
+                    "status" => false,
+                    "message" => "Error occurred while sending email, try again"
+                );
+            } else {
+                $response = array(
+                    "status" => true,
+                    "message" => "User exists, email sent"
+                );
+            }
+        } else {
+            $response = array("status" => false, "message" => "User doesn't exist, email ID not registered");
+        }
+
+        echo json_encode($response);
+    }
+
+    public function updatepassword()
+    {
+        $db = db_connect();
+        $auth = new Authentication($db);
+        $post = json_decode($this->request->getBody());
+
+        $data = $this->objOfJwt->DecodeToken($post->resetToken);
+
+        if ($data['email'] && $data['id']) {
+            if ($auth->checkCustomerByEmailAndId($data['email'], $data['id'])) {
+                $passwordObj = (object) array("password" => $this->crypt($post->password, 'e'));
+                $isProfileUpdated = $auth->updateProfile($passwordObj, $data['id']);
+
+                if ($isProfileUpdated) {
+                    $response = array("status" => true, "message" => "Password successfully updated");
+                } else {
+                    $response = array("status" => false, "message" => "Error occurred while updating password, please try again");
+                }
+            } else {
+                $response = array("status" => false, "message" => "Invalid request, token data doesn't match with user data");
+            }
+        } else {
+            $response = array("status" => false, "message" => "Not a valid token, please retry from the beginning");
+        }
+
+        echo json_encode($response);
+    }
+
     public function fetchfile()
     {
         $urlParam = $this->request->getUri()->getQuery();
