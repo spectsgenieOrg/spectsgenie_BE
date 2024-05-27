@@ -625,6 +625,38 @@ class Products extends BaseController
         echo json_encode($response);
     }
 
+    public function getProductByParent($parentName)
+    {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+
+        $parentProducts = $productModel->getParentProductsBySearchKeyword($parentName);
+
+        foreach ($parentProducts as $parent) {
+            $parent->products = $productModel->getProductByParent($parent->id);
+
+            foreach ($parent->products as $product) {
+                if ($product->pr_image !== "") {
+                    $images = explode(",", $product->pr_image);
+                    $i = 0;
+                    foreach ($images as $image) {
+                        $images[$i] = $this->baseURL . $image;
+                        $i++;
+                    }
+
+                    $product->pr_image = $images;
+                } else {
+                    $product->pr_image = [];
+                }
+            }
+        }
+
+        $response = array("status" => count($parentProducts) > 0 ? true : false, "message" => count($parentProducts) > 0 ? "List of products" : "List is empty", "data" => $parentProducts);
+
+        echo json_encode($response);
+    }
+
     // public function addfromexcel()
     // {
     //     $file = $this->request->getFile('productsSheet');

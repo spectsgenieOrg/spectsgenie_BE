@@ -78,6 +78,11 @@ class ProductModel extends Model
         return $this->db->table('sg_parent_product')->select('*')->where('name', $name)->get()->getRow();
     }
 
+    public function getParentProductsBySearchKeyword($keyword)
+    {
+        return $this->db->table('sg_parent_product')->select('*')->like('name', '%' . $keyword . '%')->get()->getResult();
+    }
+
     public function getParentProductById($id)
     {
         return $this->db->table('sg_parent_product')->select('*')->where('id', $id)->get()->getRow();
@@ -116,6 +121,11 @@ class ProductModel extends Model
     public function getProductByCategoryGenderParent($categoryId, $genderId, $parentId)
     {
         return $this->db->table('sg_product as sp')->select('sp.*')->like('sp.sg_gender_ids', '%' . $genderId . '%')->getWhere(['sp.ca_id' => $categoryId, 'sp.parent_product_id' => $parentId])->getResult();
+    }
+
+    public function getProductByParent($parentId)
+    {
+        return $this->db->table('sg_product as sp')->select('sp.*')->getWhere(['sp.parent_product_id' => $parentId])->getResult();
     }
 
     public function getCategoryDetail($categoryId)

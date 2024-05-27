@@ -69,6 +69,33 @@ class Cart extends BaseController
         echo json_encode($response);
     }
 
+    public function remove($cartId)
+    {
+        $db = db_connect();
+
+        $cart = new CartModel($db);
+
+        if ($this->request->hasHeader('Authorization')) {
+            $token = $this->request->header('Authorization')->getValue();
+            $data = $this->objOfJwt->DecodeToken($token);
+
+            if ($cart->checkIfCustomerIDisCorrectForGivenCartItem($cartId, $data['id'])) {
+                $isRemoved = $cart->removeCartItemsByCartId($cartId);
+
+                if ($isRemoved) {
+                    $response = array("message" => "Item removed from cart", "status" => true);
+                } else {
+                    $response = array("message" => "Item not removed from cart, please retry", "status" => false);
+                }
+            } else {
+                $response = array("message" => "Unauthorized attempt", "status" => false);
+            }
+        } else {
+            $response = array("message" => "Unauthorized access", "status" => false);
+        }
+        echo json_encode($response);
+    }
+
     public function items()
     {
         $db = db_connect();
@@ -112,6 +139,7 @@ class Cart extends BaseController
                     $totalTax = $totalTax + (float) $itemsList[$i]['lens_package']->price * 0.12;
                     $itemsList[$i]['gst'] = (int) $totalTax;
                     $itemsList[$i]['total_price'] = $item->price;
+                    $itemsList[$i]['id'] = $item->id; // Cart ID
                     $i++;
                 }
                 $response = array("message" => "Cart items list", "data" => $itemsList, "status" => true);
