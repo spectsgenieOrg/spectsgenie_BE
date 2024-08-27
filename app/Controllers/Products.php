@@ -376,6 +376,21 @@ class Products extends BaseController
         echo json_encode($response);
     }
 
+    public function delete()
+    {
+        $db = db_connect();
+
+        $productModel = new ProductModel($db);
+
+        $post = $this->request->getVar();
+
+        $isDeleted = $productModel->deleteProduct($post['id']);
+
+        $response = array("status" => $isDeleted, "message" => $isDeleted ? "Product deleted successfully" : "Error occurred while deleting");
+
+        echo json_encode($response);
+    }
+
     public function updatecontactlens($id)
     {
         $db = db_connect();
@@ -634,7 +649,7 @@ class Products extends BaseController
         $parentProducts = $productModel->getParentProductsBySearchKeyword($parentName);
 
         foreach ($parentProducts as $parent) {
-            $parent->products = $productModel->getProductByParent($parent->id);
+            $parent->products = $productModel->getProductByParent($parent->parent_product_id);
 
             foreach ($parent->products as $product) {
                 if ($product->pr_image !== "") {

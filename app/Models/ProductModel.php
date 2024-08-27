@@ -48,6 +48,11 @@ class ProductModel extends Model
         return $this->db->table('sg_brand')->select('bd_id, bd_name')->get()->getResult();
     }
 
+    public function deleteProduct($id)
+    {
+        return $this->db->table('sg_product')->where('pr_id', $id)->delete();
+    }
+
     public function getCategories()
     {
         return $this->db->table('sg_category')->select('ca_id, ca_name')->get()->getResult();
@@ -80,7 +85,7 @@ class ProductModel extends Model
 
     public function getParentProductsBySearchKeyword($keyword)
     {
-        return $this->db->table('sg_parent_product')->select('*')->like('name', '%' . $keyword . '%')->get()->getResult();
+        return $this->db->table('sg_parent_product')->select('id as parent_product_id, name as parent_product_name')->like('name', '%' . $keyword . '%')->get()->getResult();
     }
 
     public function getParentProductById($id)

@@ -49,7 +49,7 @@
                                     <?php $i = 0;
                                     $i++; ?>
                                     <?php foreach ($products as $product) : ?>
-                                        <tr>
+                                        <tr id="row_<?php echo $product->pr_id; ?>">
                                             <td><?php echo $i++; ?></td>
                                             <td><?php echo $product->pr_name; ?>
                                             </td>
@@ -64,6 +64,7 @@
                                             <td>
                                                 <div>
                                                     <a href="<?php echo base_url() . 'products/edit/' . $product->pr_id; ?>"><i class="fas fa-pencil-alt"></i></a>
+                                                    <button id="product_<?php echo $product->pr_id; ?>" type="button" class="btn btn-del"><i class="fas fa-trash"></i></button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -101,6 +102,31 @@
             "info": true,
             "autoWidth": false,
             "responsive": true,
+        });
+
+        $('#example2').on("click", ".btn-del", function() {
+            var id = $(this).attr('id');
+            if (confirm("Do you really want to delete this product?") == true) {
+                var obj = {
+                    id: id.split("_")[1]
+                };
+                $.ajax({
+                    url: '<?php echo base_url(); ?>products/delete',
+                    type: 'POST',
+                    data: obj,
+                    dataType: 'json',
+                    success: function(as) {
+                        if (as.status == true) {
+                            alert(as.message);
+                            $('#row_' + id.split("_")[1]).remove();
+                        } else {
+                            alert("Error while deleting");
+                        }
+                    }
+                });
+            } else {
+
+            }
         });
     });
 </script>

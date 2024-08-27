@@ -305,8 +305,8 @@ class Customer extends BaseController
                     $referrerUser = $referralModel->getReferralDetailByCode($profile->referral_code);
                     $profile->{'referral_points'} = $referrerUser->total_points;
                 }
-                $profile->{`wishlist_count`} = count($wishlists);
-                $profile->{`cart_items_count`} = count($itemsInCart);
+                $profile->{'wishlist_count'} = count($wishlists);
+                $profile->{'cart_items_count'} = count($itemsInCart);
                 $response = array("status" => true, "message" => "Customer details", "data" => $profile);
             } else {
                 $response = array("status" => false, "message" => "Customer doesn't exist");

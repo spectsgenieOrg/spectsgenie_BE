@@ -54,6 +54,7 @@ class Orders extends BaseController
             $orderItems = [];
             $itemsList = [];
 
+            $customer = $auth->getCustomerById($data['id']);
             $itemsInCart = $cart->getCartByCustomerID($data['id']);
             $totalAmount = 0;
             $i = 0;
@@ -91,14 +92,14 @@ class Orders extends BaseController
                     "order_id" => $orderId,
                     "order_date" => date('yy-m-d'),
                     "pickup_location" => "Primary",
-                    "billing_customer_name" => $data['name'],
+                    "billing_customer_name" => $customer->name,
                     "billing_last_name" => "",
                     "billing_city" => $customerAddress->city,
                     "billing_pincode" => $customerAddress->pincode,
                     "billing_state" => $customerAddress->state,
                     "billing_country" => $customerAddress->country,
-                    "billing_email" => $data['email'],
-                    "billing_phone" => $data['mobile'],
+                    "billing_email" => $customer->email,
+                    "billing_phone" => $customer->mobile,
                     "billing_address" => $customerAddress->address_line_1 . ', ' . $customerAddress->address_line_2,
                     "shipping_is_billing" => true,
                     "order_items" => $orderItems,
@@ -118,10 +119,9 @@ class Orders extends BaseController
                 $shipRocketOrderResponse = json_decode($shipRocketCreateOrder->getBody());
 
 
-
                 $shipRocketOrderResponseArray = json_decode(json_encode($shipRocketOrderResponse), true);
-                $shipRocketOrderDataResponse = array(...$shipRocketOrderResponseArray);
-                $orders->addShipRocketOrderDetail($shipRocketOrderDataResponse);
+
+                $orders->addShipRocketOrderDetail($shipRocketOrderResponseArray);
 
 
                 $isOrderCreated = $orders->addOrder($orderData);
@@ -148,9 +148,7 @@ class Orders extends BaseController
 
         if ($this->request->hasHeader('Authorization')) {
             $post = json_decode($this->request->getBody());
-
             $isOrderTransactionCreated = $orders->addOrderTransactionDetail($post);
-
             if ($isOrderTransactionCreated) {
                 $response = array("message" => "Successfully added to transactions", "status" => true);
             } else {
