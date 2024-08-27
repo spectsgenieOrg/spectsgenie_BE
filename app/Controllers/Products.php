@@ -672,15 +672,34 @@ class Products extends BaseController
         echo json_encode($response);
     }
 
-    // public function addfromexcel()
-    // {
-    //     $file = $this->request->getFile('productsSheet');
-    //     $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getTempName());
+    public function getContactLensBySlug($slug)
+    {
+        $db = db_connect();
 
-    //     $dataFromActiveSheet = $spreadsheet->getActiveSheet()->toArray();
+        $productModel = new ProductModel($db);
 
-    //     foreach ($dataFromActiveSheet as $row) {
-    //         var_dump($row);
-    //     }
-    // }
+        $contactLens = $productModel->getContactLensBySlug($slug);
+
+        if ($contactLens) {
+            if ($contactLens->images !== "") {
+                $images = explode(",", $contactLens->images);
+                $i = 0;
+
+                foreach ($images as $image) {
+                    $images[$i] = $this->baseURL . $image;
+                    $i++;
+                }
+
+                $contactLens->images = $images;
+            } else {
+                $contactLens->images = [];
+            }
+
+            $response = array("status" => true, "message" => "Contact lens details", "data" => $contactLens);
+        } else {
+            $response = array("status" => false, "message" => "Contact lens details not found with this slug, please try another", "data" => null);
+        }
+
+        echo json_encode($response);
+    }
 }

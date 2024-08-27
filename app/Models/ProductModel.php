@@ -78,6 +78,11 @@ class ProductModel extends Model
         return $this->db->table('sg_product')->select('*')->getWhere(['parent_product_id' => $parentId, 'slug' => $slug])->getRow();
     }
 
+    public function getContactLensBySlug($slug)
+    {
+        return $this->db->table('sg_contactlens')->select('*')->getWhere(['slug' => $slug])->getRow();
+    }
+
     public function getParentProductByName($name)
     {
         return $this->db->table('sg_parent_product')->select('*')->where('name', $name)->get()->getRow();
