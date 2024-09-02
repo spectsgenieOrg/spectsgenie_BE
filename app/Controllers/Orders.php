@@ -27,6 +27,22 @@ class Orders extends BaseController
         }
     }
 
+    /* Load UI pages */
+
+    public function all()
+    {
+        $db = db_connect();
+
+        $orderModel = new OrderModel($db);
+        $orders = $orderModel->allOrders();
+
+        $data['orders'] = $orders;
+
+        return view('common/header')
+            . view('pages/all-orders', $data)
+            . view('common/footer');
+    }
+
     public function add()
     {
         $db = db_connect();

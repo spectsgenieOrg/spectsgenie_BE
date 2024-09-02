@@ -14,6 +14,11 @@ class OrderModel extends Model
         $this->db = &$db;
     }
 
+    public function allOrders()
+    {
+        return $this->db->table('sg_orders_online')->select('*')->orderBy('id', 'DESC')->get()->getResult();
+    }
+
     public function addOrder($data)
     {
         return $this->db->table('sg_orders_online')->insert($data) ? true : false;

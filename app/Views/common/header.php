@@ -398,6 +398,15 @@ $roles = [];
                             </li>
 
                             <li class="nav-item">
+                                <a href="/orders/all" class="nav-link cursor">
+                                    <i class="nav-icon fas fa-rupee-sign"></i>
+                                    <p>
+                                        Orders
+                                    </p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
                                 <a href="/logout" class="nav-link cursor">
                                     <i class="nav-icon fas fa-sign-out-alt"></i>
                                     <p>
