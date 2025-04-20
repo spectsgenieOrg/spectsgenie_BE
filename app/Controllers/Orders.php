@@ -43,6 +43,43 @@ class Orders extends BaseController
             . view('common/footer');
     }
 
+    public function orderdetail($orderId)
+    {
+        $db = db_connect();
+        $orderModel = new OrderModel($db);
+
+        $order = $orderModel->getOrderedGlassesItems($orderId);
+        $orderDetailIds = explode(",", $order->{'order_detail_id'});
+
+        foreach ($orderDetailIds as $orderDetailId) {
+            $item_detail = $orderModel->getOrderDetailById($orderDetailId);
+            if ($item_detail->product_images !== "") {
+                $images = explode(",", $item_detail->product_images);
+                $i = 0;
+
+                foreach ($images as $image) {
+                    $images[$i] = $this->baseURL . $image;
+                    $i++;
+                }
+
+                $item_detail->product_images = $images;
+            } else {
+                $item_detail->product_images = [];
+            }
+            $itemDetailArr[] = $item_detail;
+        }
+
+        $orders['ordered_items'] = $itemDetailArr;
+        $orders['order'] = $order;
+
+
+        $data['orders'] = $orders;
+
+        return view('common/header')
+            . view('pages/order-detail', $data)
+            . view('common/footer');
+    }
+
     public function add()
     {
         $db = db_connect();

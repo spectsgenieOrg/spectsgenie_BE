@@ -51,10 +51,10 @@
                                     <?php foreach ($orders as $order) : ?>
                                         <tr id="row_<?php echo $order->order_id; ?>">
                                             <td><?php echo $i++; ?></td>
-                                            <td><?php echo $order->order_id; ?>
+                                            <td><a href="<?php echo "/orders/orderdetail/" . $order->order_id; ?>"><?php echo $order->order_id; ?></a>
                                             </td>
                                             <td>₹<?php echo $order->total_amount; ?></td>
-        
+
                                             <td>₹<?php echo $order->discount; ?></td>
                                             <td><span class="platform"><?php echo $order->discount_code === "" ? "NA" : $order->discount_code; ?></span></td>
                                             <td><span class="platform"><?php echo $order->order_status; ?></span></td>

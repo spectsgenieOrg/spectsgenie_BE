@@ -212,13 +212,13 @@ $roles = [];
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="/admin/add-category" class="nav-link">
+                                        <a href="/category/add" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Add a category</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="/admin/all-categories" class="nav-link">
+                                        <a href="/category/all" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>View all categories</p>
                                         </a>
