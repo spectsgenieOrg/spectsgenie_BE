@@ -71,6 +71,10 @@
                                 <label for="inputSalePrice">Product Sale Price</label>
                                 <input id="inputSalePrice" type="number" class="form-control" name="pr_sprice" />
                             </div>
+                            <div class="form-group">
+                                <label for="inputPrMaterial">Product Material</label>
+                                <input id="inputPrMaterial" type="text" class="form-control" name="pr_material" />
+                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -111,6 +115,11 @@
                                     <?php endforeach ?>
                                 </select>
                             </div>
+
+                            <div class="form-group">
+                                <label for="inputPrWarranty">Product Warranty</label>
+                                <input id="inputPrWarranty" type="text" class="form-control" name="pr_warranty" />
+                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -119,7 +128,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -130,7 +139,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -143,7 +152,7 @@
                     <!-- /.card -->
                 </div>
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -156,12 +165,25 @@
                     <!-- /.card -->
                 </div>
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="inputASize">D Size</label>
                                 <input type="number" id="inputDSize" name="pr_d_size" class="form-control">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+
+                <div class="col">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="shape">Shape</label>
+                                <input type="text" id="shape" name="shape" class="form-control">
                             </div>
                         </div>
                         <!-- /.card-body -->

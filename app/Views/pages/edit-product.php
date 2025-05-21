@@ -72,6 +72,10 @@ $baseURL = 'https://newpos.spectsgenie.com/';
                                 <label for="inputSalePrice">Product Sale Price</label>
                                 <input id="inputSalePrice" type="number" class="form-control" value="<?php echo $product->pr_sprice; ?>" name="pr_sprice" />
                             </div>
+                            <div class="form-group">
+                                <label for="inputPrMaterial">Product Material</label>
+                                <input id="inputPrMaterial" type="text" class="form-control" value="<?php echo $product->pr_material; ?>" name="pr_material" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -114,6 +118,10 @@ $baseURL = 'https://newpos.spectsgenie.com/';
                                     <?php endforeach ?>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label for="inputPrWarranty">Product Warranty</label>
+                                <input id="inputPrWarranty" type="text" class="form-control" value="<?php echo $product->pr_warranty; ?>" name="pr_warranty" />
+                            </div>
                         </div>
 
                     </div>
@@ -123,7 +131,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
 
             <div class="row">
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -136,7 +144,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
 
                 </div>
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -150,7 +158,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
 
                 </div>
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -164,7 +172,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
 
                 </div>
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -176,6 +184,20 @@ $baseURL = 'https://newpos.spectsgenie.com/';
 
                     </div>
 
+                </div>
+
+                <div class="col">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="shape">Shape</label>
+                                <input type="text" id="shape" name="shape" value="<?php echo $product->shape;
+                                                                                                ?>" class="form-control">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
                 </div>
 
                 <input type="hidden" name="br_id" value="<?php echo $session->get('user_id'); ?>" />
