@@ -47,7 +47,7 @@ class OrderModel extends Model
 
     public function getOrderedGlassesItems($orderId)
     {
-        $query = $this->db->query('select o.id as order_id, o.created_at as order_placed_on, o.total_amount, o.actual_total_amount, o.discount, o.order_status, o.address_id, o.order_id as order_number, o.customer_id, c.name as customer_name, ca.address_name, ca.address_line_1, ca.address_line_2, ca.pincode, ca.city, ca.state, ca.country, group_concat(od.id) as order_detail_id from sg_orders_online o inner join sg_customer_online c on o.customer_id = c.id inner join sg_order_detail od on o.order_id = od.order_id inner join sg_customer_address ca on o.address_id = ca.id where o.order_id = "' . $orderId . '" group by o.id, o.order_id, o.customer_id order by o.id desc');
+        $query = $this->db->query('select o.id, o.order_id, o.created_at as order_placed_on, o.order_data, o.total_amount, o.actual_total_amount, o.discount, o.order_status, o.address_id, o.order_id as order_number, o.customer_id, c.name as customer_name, ca.address_name, ca.address_line_1, ca.address_line_2, ca.pincode, ca.city, ca.state, ca.country from sg_orders_online o inner join sg_customer_online c on o.customer_id = c.id inner join sg_customer_address ca on o.address_id = ca.id where o.order_id = "' . $orderId . '" group by o.id, o.order_id, o.customer_id order by o.id desc');
 
         return $query->getRow();
     }

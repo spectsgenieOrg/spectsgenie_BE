@@ -49,35 +49,35 @@ class Orders extends BaseController
         $orderModel = new OrderModel($db);
 
         $order = $orderModel->getOrderedGlassesItems($orderId);
-        $orderDetailIds = explode(",", $order->{'order_detail_id'});
+        $orderedItems = json_decode($order->order_data, true);
 
-        foreach ($orderDetailIds as $orderDetailId) {
-            $item_detail = $orderModel->getOrderDetailById($orderDetailId);
-            if ($item_detail->product_images !== "") {
-                $images = explode(",", $item_detail->product_images);
-                $i = 0;
+        // foreach ($orderDetailIds as $orderDetailId) {
+        //     $item_detail = $orderModel->getOrderDetailById($orderDetailId);
+        //     if ($item_detail->product_images !== "") {
+        //         $images = explode(",", $item_detail->product_images);
+        //         $i = 0;
 
-                foreach ($images as $image) {
-                    $images[$i] = $this->baseURL . $image;
-                    $i++;
-                }
+        //         foreach ($images as $image) {
+        //             $images[$i] = $this->baseURL . $image;
+        //             $i++;
+        //         }
 
-                $item_detail->product_images = $images;
-            } else {
-                $item_detail->product_images = [];
-            }
-            $itemDetailArr[] = $item_detail;
-        }
+        //         $item_detail->product_images = $images;
+        //     } else {
+        //         $item_detail->product_images = [];
+        //     }
+        //     $itemDetailArr[] = $item_detail;
+        // }
 
-        $orders['ordered_items'] = $itemDetailArr;
+        $orders['ordered_items'] = $orderedItems;
         $orders['order'] = $order;
 
 
         $data['orders'] = $orders;
 
         return view('common/header')
-            . view('pages/order-detail', $data)
-            . view('common/footer');
+             . view('pages/order-detail', $data)
+             . view('common/footer');
     }
 
     public function add()

@@ -5,12 +5,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Order #<?php echo $orders['order']->{'order_number'}; ?></h1>
+                    <h1>Order #<?php echo $orders['order']->{'order_id'}; ?></h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Orders / <?php echo $orders['order']->{'order_number'}; ?></li>
+                        <li class="breadcrumb-item active"><a href="/orders/all">Orders / <?php echo $orders['order']->{'order_id'}; ?></a></li>
                     </ol>
                 </div>
             </div>
@@ -36,56 +36,7 @@
                     </div>
                 </div>
 
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Product List</h3>
-                        </div>
-                        <!-- /.card-header -->
-                        <div class="card-body">
-                            <table id="example2" class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Sl. No</th>
-                                        <th>Order Detail ID</th>
-                                        <th>Product Name</th>
-                                        <th>Product SKU</th>
-                                        <th>Product Price</th>
-                                        <th>Parent Product Name</th>
-                                        <th>Lens Type Name</th>
-                                        <th>Lens Package Name</th>
-                                        <th>Lens Package Price</th>
-                                        <th>Lens Package Material</th>
-                                        <th>Category Name</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $i = 0;
-                                    $i++; ?>
-                                    <?php foreach ($orders['ordered_items'] as $order) : ?>
-                                        <tr id="row_<?php echo $order->order_detail_id; ?>">
-                                            <td><?php echo $i++; ?></td>
-                                            <td><?php echo $order->order_detail_id; ?>
-                                            </td>
-                                            <td><?php echo $order->product_name; ?></td>
-
-                                            <td><?php echo $order->product_sku; ?></td>
-                                            <td>₹<?php echo $order->product_price; ?></td>
-                                            <td><?php echo $order->parent_product_name; ?></td>
-                                            <td><?php echo $order->lens_type_name; ?></td>
-                                            <td><?php echo $order->lens_package_name; ?></td>
-                                            <td>₹<?php echo $order->lens_package_price; ?></td>
-                                            <td><?php echo $order->lens_package_material; ?></td>
-                                            <td><?php echo $order->category_name; ?></td>
-                                        </tr>
-                                    <?php endforeach ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- /.card-body -->
-                    </div>
-                    <!-- /.card -->
-                </div>
+                
                 <!-- /.col -->
             </div>
             <!-- /.row -->
