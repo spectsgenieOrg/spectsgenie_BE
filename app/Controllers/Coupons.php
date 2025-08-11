@@ -64,4 +64,70 @@ class Coupons extends BaseController
 
         echo json_encode($response);
     }
+
+    public function all()
+    {
+        $db = db_connect();
+        $couponModel = new CouponsModel($db);
+        $categoryModel = new CategoryModel($db);
+
+        $coupons = $couponModel->getAllCoupons();
+        $categories = $categoryModel->allCategories();
+
+        // Map category IDs to names for quick lookup
+        $categoryMap = [];
+        foreach ($categories as $category) {
+            $categoryMap[$category->ca_id] = $category->ca_name;
+        }
+
+        // Append ca_name to each coupon if ca_id is present
+        foreach ($coupons as &$coupon) {
+            if (isset($coupon->ca_id) && isset($categoryMap[$coupon->ca_id])) {
+                $coupon->ca_name = $categoryMap[$coupon->ca_id];
+            }
+        }
+        unset($coupon);
+
+        $data['coupons'] = $coupons;
+
+        return view('common/header')
+            . view('pages/all-coupons', $data)
+            . view('common/footer');
+    }
+
+    public function edit($couponCode)
+    {
+        $db = db_connect();
+        $couponModel = new CouponsModel($db);
+        $categoryModel = new CategoryModel($db);
+
+        $coupon = $couponModel->getCouponByCode($couponCode);
+        if (!$coupon) {
+            return redirect()->to(base_url('coupons/all'))->with('error', 'Coupon not found');
+        }
+
+        $categories = $categoryModel->allCategories();
+        $data['coupon'] = $coupon;
+        $data['categories'] = $categories;
+
+        return view('common/header')
+            . view('pages/edit-coupon', $data)
+            . view('common/footer');
+    }
+
+    public function update()
+    {
+        $db = db_connect();
+        $couponModel = new CouponsModel($db);
+
+        $post = $this->request->getVar();
+
+        if ($couponModel->updateCoupon($post['coupon_code'], $post)) {
+            $response = array("status" => true, "message" => "Coupon updated successfully");
+        } else {
+            $response = array("status" => false, "message" => "Invalid coupon data");
+        }
+
+        echo json_encode($response);
+    }
 }
