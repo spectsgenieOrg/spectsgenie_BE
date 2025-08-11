@@ -70,6 +70,8 @@
                                             <td>
                                                 <div>
                                                     <a href="<?php echo base_url() . 'coupons/edit/' . $coupon->coupon_code; ?>"><i class="fas fa-pencil-alt"></i></a>
+                                                    
+                                                    <a href="<?php echo base_url() . 'coupons/delete/' . $coupon->coupon_code; ?>" onclick="return confirm('Are you sure you want to delete this coupon?');"><i class="fas fa-trash-alt"></i></a>
                                                 </div>
                                             </td>
                                         </tr>

@@ -130,4 +130,18 @@ class Coupons extends BaseController
 
         echo json_encode($response);
     }
+
+    public function delete($couponCode)
+    {
+        $db = db_connect();
+        $couponModel = new CouponsModel($db);
+
+        if ($couponModel->deleteCoupon($couponCode)) {
+            $response = array("status" => true, "message" => "Coupon deleted successfully");
+        } else {
+            $response = array("status" => false, "message" => "Failed to delete coupon");
+        }
+
+        return redirect()->to(base_url('coupons/all'))->with('response', $response);
+    }
 }
