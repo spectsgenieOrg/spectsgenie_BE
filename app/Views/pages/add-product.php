@@ -196,7 +196,7 @@
 
             <div class="row">
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -212,7 +212,7 @@
                     </div>
                     <!-- /.card -->
                 </div>
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -230,7 +230,7 @@
                     <!-- /.card -->
                 </div>
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -247,7 +247,7 @@
                     <!-- /.card -->
                 </div>
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -261,6 +261,21 @@
                         <!-- /.card-body -->
                     </div>
                     <!-- /.card -->
+                </div>
+
+                <div class="col">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputStatus">Is Item on Flash Sale</label>
+                                <select class="form-control" name="on_sale" id="inputStatus">
+                                    <option disabled selected>Select an option</option>
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <input type="hidden" name="br_id" value="<?php echo $session->get('user_id'); ?>" />

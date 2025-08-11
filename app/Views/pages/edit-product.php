@@ -18,7 +18,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/products/all">Home</a></li>
                         <li class="breadcrumb-item active">Edit product</li>
                     </ol>
                 </div>
@@ -153,9 +153,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
                                                                                                 ?>" class="form-control">
                             </div>
                         </div>
-
                     </div>
-
                 </div>
 
                 <div class="col">
@@ -192,7 +190,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
                             <div class="form-group">
                                 <label for="shape">Shape</label>
                                 <input type="text" id="shape" name="shape" value="<?php echo $product->shape;
-                                                                                                ?>" class="form-control">
+                                                                                    ?>" class="form-control">
                             </div>
                         </div>
                         <!-- /.card-body -->
@@ -204,7 +202,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
             </div>
 
             <div class="row">
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -221,7 +219,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
                     </div>
 
                 </div>
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -240,7 +238,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
                     </div>
 
                 </div>
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -258,7 +256,7 @@ $baseURL = 'https://newpos.spectsgenie.com/';
 
                 </div>
 
-                <div class="col-md-3">
+                <div class="col">
                     <div class="card card-primary">
                         <div class="card-body">
                             <div class="form-group">
@@ -273,7 +271,25 @@ $baseURL = 'https://newpos.spectsgenie.com/';
                                 </select>
                             </div>
                         </div>
+                    </div>
+                </div>
 
+                <div class="col">
+                    <div class="card card-primary">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputStatus">Is Item on Flash Sale</label>
+                                <select class="form-control" name="on_sale" id="inputStatus">
+                                    <option disabled selected>Select an option</option>
+                                    <option value="1" <?php if ($product->on_sale === "1") {
+                                                            echo "selected";
+                                                        } ?>>Yes</option>
+                                    <option value="0" <?php if ($product->on_sale === "0") {
+                                                            echo "selected";
+                                                        } ?>>No</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
